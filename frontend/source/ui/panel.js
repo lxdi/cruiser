@@ -11,42 +11,49 @@ export class Panel extends React.Component {
     this.state = {
       panelName : 'panel ' + props.name
     }
-    registerObject(this.state.panelName, {'cwd':'/'})
+    //registerObject(this.state.panelName, {'cwd':'/'})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, file) => handleChangeDir(this, stSetter, file))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
+    registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
-    fireEvent('files-rep', 'get-files-by-path', [chkSt(this.state.panelName, 'cwd')])
+    //fireEvent('files-rep', 'get-files-by-path', [chkSt(this.state.panelName, 'cwd')])
   }
 
   render(){
-    return <div class='panel-main'>
-            <div>{chkSt(this.state.panelName, 'cwd')}</div>
+    if(chkSt('gstate', 'stateObj')!=null){
+      return <div class='panel-main'>
+            <div>{chkSt('gstate', 'stateObj').panels[this.props.name].cwd}</div>
             <div>{getFilesUI(this)}</div>
           </div>
+    } else {
+      return 'Loading...'
+    }
   }
 
 }
 
 const handleChangeDir = function(comp, stSetter, file){
   const newCwd = file.path + file.name
-  stSetter('cwd', newCwd)
+  chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
   fireEvent('files-rep', 'get-files-by-path', [newCwd])
+  fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
   comp.setState({})
 }
 
 const handleBack = function(comp, stSetter){
-  const cwd = chkSt(comp.state.panelName, 'cwd')
+  const cwd = chkSt('gstate', 'stateObj').panels[comp.props.name].cwd
   var newCwd = '/'
   if(cwd!='/' && cwd.lastIndexOf('/')>0){
     newCwd = cwd.substring(0, cwd.lastIndexOf('/'))
   }
-  stSetter('cwd', newCwd)
+  chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
+  fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
   //fireEvent('files-rep', 'get-files-by-path', [newCwd])
   comp.setState({})
 }
 
 const getFilesUI = function(comp){
-  const files = chkSt('files-rep', chkSt(comp.state.panelName, 'cwd'))
+  const files = chkSt('files-rep', chkSt('gstate', 'stateObj').panels[comp.props.name].cwd)
   if(files!=null){
     const dirsUI = []
     const filesUI = []//files.map(f => <div> <a href="#">{f.name} </a></div>)
@@ -70,6 +77,7 @@ const getFilesUI = function(comp){
               {filesUI}
           </table>
   } else {
+    fireEvent('files-rep', 'get-files-by-path', [chkSt('gstate', 'stateObj').panels[comp.props.name].cwd])
     return 'Loading...'
   }
 }
