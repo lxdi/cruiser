@@ -24,3 +24,5 @@ out/
 frontend/build/bundle.js
 frontend/node_modules/
 frontend/package-lock.json
+
+backend/src/main/resources/static/

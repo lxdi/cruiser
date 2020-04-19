@@ -6,6 +6,7 @@ import {ControlPanel} from './ui/control-panel'
 
 import './data/files'
 import './data/state'
+import './data/commands'
 
 
 ReactDOM.render(<div id="app" />, document.body);

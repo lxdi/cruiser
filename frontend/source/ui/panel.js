@@ -83,11 +83,16 @@ const getFilesUI = function(comp){
 }
 
 const getFileEntryTrUI = function(comp, file){
-  return <tr class='file-div' onClick={()=>{if(file.isDir)fireEvent(comp.state.panelName, 'change-dir', [file])}}>
+  return <tr class='file-div' onClick={()=>hanldeFileEntryClick(comp, file)}>
             <td width='70%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='20%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
         </tr>
+}
+
+const hanldeFileEntryClick = function(comp, file){
+  if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file])
+  else fireEvent('commands', 'open', [file.path+file.name])
 }
 
 const getFileNameUI = function(file){
