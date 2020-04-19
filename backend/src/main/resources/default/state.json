@@ -1,12 +1,4 @@
 {
-  "panels" : {
-    "left": {
-      "cwd": "/"
-    },
-    "right": {
-      "cwd": "/"
-    }
-  },
   "bookmarks": [
     {
       "name": "Root",
@@ -14,17 +6,44 @@
       "type": "dir"
     }
   ],
+  "panels": {
+    "left": {
+      "cwd": "/"
+    },
+    "right": {
+      "cwd": "/"
+    }
+  },
   "commands": {
     "type-mappings": [
       {
-        "type": "video",
-        "match": "start",
-        "command": ["vlc"]
+        "match": "equals",
+        "type": "application/x-shellscript",
+        "command": [],
+        "match-type": "mime"
       },
       {
-        "type": "application",
+        "match": "equals",
+        "type": "application/x-executable",
+        "command": [],
+        "match-type": "mime"
+      },
+      {
         "match": "start",
-        "command": []
+        "type": "video",
+        "command": [
+          "vlc"
+        ],
+        "match-type": "mime"
+      },
+      {
+        "type": [
+          ".xmind"
+        ],
+        "command": [
+          "xmind"
+        ],
+        "match-type": "ext"
       }
     ]
   }

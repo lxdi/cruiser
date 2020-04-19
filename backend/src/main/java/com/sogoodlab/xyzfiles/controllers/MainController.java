@@ -84,23 +84,59 @@ public class MainController {
 
     private List<String> getCommand(String path){
         List<String> result = new ArrayList<>(Arrays.asList("mimeopen", "-n"));
-        String mimeType = getTypeMime(path);
         JSONObject stateJson = getStateJson();
-        JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
-        for(int i = 0; i<mappings.length(); i++){
-            JSONObject mapping = mappings.getJSONObject(i);
-            if(mapping.get("match").equals("start")){
-                if(mimeType.startsWith((String) mapping.get("type"))){
-                    result = toList(mapping.getJSONArray("command"));
-                }
-            } else {
-                if(mimeType.equalsIgnoreCase((String) mapping.get("type"))){
-                    result = toList(mapping.getJSONArray("command"));
-                }
-            }
+        List<String> byExt = checkByExt(path, stateJson);
+        if(byExt!=null){
+            result = byExt;
+        } else {
+            result = Optional.ofNullable(checkByMimeType(path, stateJson)).orElse(result);
         }
         result.add(path);
         return result;
+    }
+
+    private List<String> checkByExt(String path, JSONObject stateJson){
+        String extension = getExtension(path);
+        if(extension==null){
+            return null;
+        }
+        JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
+        for(int i = 0; i<mappings.length(); i++){
+            JSONObject mapping = mappings.getJSONObject(i);
+            if(mapping.getString("match-type").equalsIgnoreCase("ext")
+                    && toList(mapping.getJSONArray("type")).contains(extension)){
+                return toList(mapping.getJSONArray("command"));
+            }
+        }
+        return null;
+    }
+
+    private List<String> checkByMimeType(String path, JSONObject stateJson){
+        String mimeType = getTypeMime(path);
+        JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
+        for(int i = 0; i<mappings.length(); i++){
+            JSONObject mapping = mappings.getJSONObject(i);
+            if(mapping.getString("match-type").equalsIgnoreCase("mime")){
+                if(mapping.get("match").equals("start")){
+                    if(mimeType.startsWith((String) mapping.get("type"))){
+                        return toList(mapping.getJSONArray("command"));
+                    }
+                } else {
+                    if(mimeType.equalsIgnoreCase((String) mapping.get("type"))){
+                        return toList(mapping.getJSONArray("command"));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getExtension(String path){
+        if(path.contains(".")){
+            return path.substring(path.lastIndexOf("."));
+        } else {
+            return null;
+        }
     }
 
     private String getTypeMime(String path) {
