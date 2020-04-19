@@ -7,11 +7,25 @@
       "cwd": "/"
     }
   },
+  "bookmarks": [
+    {
+      "name": "Root",
+      "path": "/",
+      "type": "dir"
+    }
+  ],
   "commands": {
-    "type-mappings": [{
-      "type": "video",
-      "match": "start",
-      "command": ["vlc"]
-    }]
+    "type-mappings": [
+      {
+        "type": "video",
+        "match": "start",
+        "command": ["vlc"]
+      },
+      {
+        "type": "application",
+        "match": "start",
+        "command": []
+      }
+    ]
   }
 }

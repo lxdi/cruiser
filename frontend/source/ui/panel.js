@@ -9,10 +9,10 @@ export class Panel extends React.Component {
     super(props)
 
     this.state = {
-      panelName : 'panel ' + props.name
+      panelName : 'panel-' + props.name
     }
     //registerObject(this.state.panelName, {'cwd':'/'})
-    registerEvent(this.state.panelName, 'change-dir', (stSetter, file) => handleChangeDir(this, stSetter, file))
+    registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
@@ -32,8 +32,7 @@ export class Panel extends React.Component {
 
 }
 
-const handleChangeDir = function(comp, stSetter, file){
-  const newCwd = file.path + file.name
+const handleChangeDir = function(comp, stSetter, newCwd){
   chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
   fireEvent('files-rep', 'get-files-by-path', [newCwd])
   fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
@@ -84,14 +83,14 @@ const getFilesUI = function(comp){
 
 const getFileEntryTrUI = function(comp, file){
   return <tr class='file-div' onClick={()=>hanldeFileEntryClick(comp, file)}>
-            <td width='70%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
-            <td width='20%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
+            <td width='80%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
+            <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
         </tr>
 }
 
 const hanldeFileEntryClick = function(comp, file){
-  if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file])
+  if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name+'/'])
   else fireEvent('commands', 'open', [file.path+file.name])
 }
 
