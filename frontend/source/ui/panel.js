@@ -44,6 +44,7 @@ const handleBack = function(comp, stSetter){
   var newCwd = '/'
   if(cwd!='/' && cwd.lastIndexOf('/')>0){
     newCwd = cwd.substring(0, cwd.lastIndexOf('/'))
+    newCwd = newCwd.substring(0, newCwd.lastIndexOf('/'))+"/"
   }
   chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
   fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
