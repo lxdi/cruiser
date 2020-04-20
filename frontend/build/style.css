@@ -23,7 +23,7 @@
 
 .panel-main {
   padding: 3px;
-  border: 1px solid lightblue;
+  /* border: 1px solid lightblue; */
   border-radius: 10px;
   overflow: auto;
   height:97vh;

@@ -27,7 +27,7 @@ const getBookmarksUI = function(comp){
     stateObj.bookmarks.forEach((b)=>{
       if(b.type == 'dir'){
         dirBookmarks.push(<div>
-            <a href='#' onClick={()=>fireEvent('panel-left', 'change-dir', [b.path])}>{b.name}</a>
+            <a href='#' onClick={()=>fireEvent(getCurrentPanel(), 'change-dir', [b.path])}>{b.name}</a>
           </div>)
       } else {
         fileBookmarks.push(<div>
@@ -41,4 +41,12 @@ const getBookmarksUI = function(comp){
           <div> -/- </div>
           {fileBookmarks}
         </div>
+}
+
+const getCurrentPanel = function(){
+  if(chkSt('panel-left', 'current')){
+    return 'panel-left'
+  } else {
+    return 'panel-right'
+  }
 }

@@ -4,6 +4,8 @@ import {Button} from 'react-bootstrap'
 
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
+registerEvent('panels', 'switch-current', ()=>{})
+
 export class Panel extends React.Component {
   constructor(props){
     super(props)
@@ -11,9 +13,10 @@ export class Panel extends React.Component {
     this.state = {
       panelName : 'panel-' + props.name
     }
-    //registerObject(this.state.panelName, {'cwd':'/'})
+    registerObject(this.state.panelName, {'current': props.current})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
+    registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
     //fireEvent('files-rep', 'get-files-by-path', [chkSt(this.state.panelName, 'cwd')])
@@ -21,8 +24,8 @@ export class Panel extends React.Component {
 
   render(){
     if(chkSt('gstate', 'stateObj')!=null){
-      return <div class='panel-main'>
-            <div>{chkSt('gstate', 'stateObj').panels[this.props.name].cwd}</div>
+      return <div class='panel-main' style={{"border": chkSt(this.state.panelName, 'current')==true?"2px solid blue":"1px solid lightblue"}}>
+            <div onClick={()=>fireEvent('panels', 'switch-current')}>{chkSt('gstate', 'stateObj').panels[this.props.name].cwd}</div>
             <div>{getFilesUI(this)}</div>
           </div>
     } else {

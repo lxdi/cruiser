@@ -18,8 +18,8 @@ function rerender(){
 			<table class='main-table'>
 				<tr>
 					<td class='conpanel-td'><ControlPanel/></td>
-					<td class='panel-td'><Panel name='left'/></td>
-					<td class='panel-td'><Panel name='right'/></td>
+					<td class='panel-td'><Panel name='left' current={true}/></td>
+					<td class='panel-td'><Panel name='right' current={false}/></td>
 				</tr>
 			</table>
 		</div>, app);
