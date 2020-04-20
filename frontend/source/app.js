@@ -4,13 +4,17 @@ import ReactDOM from 'react-dom';
 import {Panel} from './ui/panel.js'
 import {ControlPanel} from './ui/control-panel'
 
+import {fireEvent} from 'absevents'
+
 import './data/files'
 import './data/state'
 import './data/commands'
+import './services/onkeypress-handler'
 
 
 ReactDOM.render(<div id="app" />, document.body);
 const app = document.getElementById("app");
+document.addEventListener("keydown", (event)=>fireEvent('key-press-handler', 'press', [event]), false);
 
 function rerender(){
 	ReactDOM.render(
