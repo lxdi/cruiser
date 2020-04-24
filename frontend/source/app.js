@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import {Panel} from './ui/panel.js'
 import {ControlPanel} from './ui/control-panel'
+import {FileModal} from './ui/modals/file-modal'
 
 import {fireEvent} from 'absevents'
 
@@ -26,6 +27,7 @@ function rerender(){
 					<td class='panel-td'><Panel name='right' current={false}/></td>
 				</tr>
 			</table>
+			<FileModal />
 		</div>, app);
 }
 

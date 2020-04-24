@@ -84,25 +84,27 @@ const getFilesUI = function(comp){
     return 'Loading...'
   }
 }
-
+// /onClick={()=>hanldeFileEntryClick(comp, file)}
 const getFileEntryTrUI = function(comp, file){
-  return <tr class='file-div' onClick={()=>hanldeFileEntryClick(comp, file)}>
+  return <tr class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td width='80%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
         </tr>
 }
 
-const hanldeFileEntryClick = function(comp, file){
-  if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name+'/'])
-  else fireEvent('commands', 'open', [file.path+file.name])
+const hanldeFileEntryClick = function(comp, file, event){
+  if(!event.defaultPrevented){
+    if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name+'/'])
+    else fireEvent('commands', 'open', [file.path+file.name])
+  }
 }
 
 const getFileNameUI = function(file){
   if(file.isDir){
-    return <div style={{'color': 'orange'}}> [{file.name}]</div>
+    return <div class='file-link' style={{'color': 'orange'}}> <a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}> [{file.name}] </a> </div>
   } else {
-    return <div style={{'color': 'grey'}}> {file.name}</div>
+    return <div class='file-link' style={{'color': 'grey'}}> <a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}> {file.name} </a> </div>
   }
 }
 
