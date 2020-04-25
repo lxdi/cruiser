@@ -88,6 +88,7 @@ const getFilesUI = function(comp){
                 </td>
                 <td></td>
                 <td></td>
+                <td></td>
               </tr>
               {dirsUI}
               {filesUI}
@@ -100,9 +101,10 @@ const getFilesUI = function(comp){
 // /onClick={()=>hanldeFileEntryClick(comp, file)}
 const getFileEntryTrUI = function(comp, file){
   return <tr class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
-            <td width='80%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
+            <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
+            <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}>More</a></td>
         </tr>
 }
 
@@ -115,9 +117,9 @@ const hanldeFileEntryClick = function(comp, file, event){
 
 const getFileNameUI = function(file){
   if(file.isDir){
-    return <div class='file-link' style={{'color': 'orange'}}> <a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}> [{file.name}] </a> </div>
+    return <div class='file-link' style={{'color': 'orange'}}>[{file.name}]</div>
   } else {
-    return <div class='file-link' style={{'color': 'grey'}}> <a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}> {file.name} </a> </div>
+    return <div class='file-link' style={{'color': 'grey'}}>{file.name} </div>
   }
 }
 
@@ -150,10 +152,10 @@ const sortByLong = function(val1, val2, order){
 }
 
 function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return '0 By';
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const sizes = ['By', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
