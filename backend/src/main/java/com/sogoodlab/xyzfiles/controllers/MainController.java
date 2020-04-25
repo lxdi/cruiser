@@ -63,7 +63,9 @@ public class MainController {
 
     private JSONObject getStateJson() {
         try {
-            return new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
+            JSONObject result = new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
+            markSystem(result);
+            return result;
         }catch (IOException e){
             throw new RuntimeException("Error while reading state json file: ", e);
         }
@@ -80,6 +82,12 @@ public class MainController {
             }
         }
         return stateJsonFile;
+    }
+
+    private void markSystem(JSONObject jsonObject){
+        if(!jsonObject.has("system")){
+            jsonObject.put("system", System.getProperty("os.name"));
+        }
     }
 
     private List<String> getCommand(String path){

@@ -19,7 +19,7 @@ public class FileDto {
     }
 
     public static FileDto of(File file){
-        return new FileDto(file.getName(), file.getParent().equals("/")?"/":file.getParent()+"/",
+        return new FileDto(file.getName(), file.getParent().equals(File.separator)? File.separator:file.getParent()+File.separator,
                 file.isDirectory(), file.lastModified(), file.length());
     }
 

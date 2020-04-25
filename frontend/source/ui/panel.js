@@ -6,6 +6,8 @@ import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 
 
 registerEvent('panels', 'switch-current', ()=>{})
 
+var separator = null
+
 export class Panel extends React.Component {
   constructor(props){
     super(props)
@@ -44,15 +46,26 @@ const handleChangeDir = function(comp, stSetter, newCwd){
 
 const handleBack = function(comp, stSetter){
   const cwd = chkSt('gstate', 'stateObj').panels[comp.props.name].cwd
-  var newCwd = '/'
-  if(cwd!='/' && cwd.lastIndexOf('/')>0){
-    newCwd = cwd.substring(0, cwd.lastIndexOf('/'))
-    newCwd = newCwd.substring(0, newCwd.lastIndexOf('/'))+"/"
+  var newCwd = getSeparator()
+  if(cwd!=getSeparator() && cwd.lastIndexOf(getSeparator())>0){
+    newCwd = cwd.substring(0, cwd.lastIndexOf(getSeparator()))
+    newCwd = newCwd.substring(0, newCwd.lastIndexOf(getSeparator()))+getSeparator()
   }
   chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
   fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
   //fireEvent('files-rep', 'get-files-by-path', [newCwd])
   comp.setState({})
+}
+
+const getSeparator = function(){
+  if(separator==null){
+    if(chkSt('gstate', 'stateObj').system.toLowerCase().includes('windows')){
+      separator = '\\'
+    } else {
+      separator = '/'
+    }
+  }
+  return separator
 }
 
 const getFilesUI = function(comp){
@@ -95,7 +108,7 @@ const getFileEntryTrUI = function(comp, file){
 
 const hanldeFileEntryClick = function(comp, file, event){
   if(!event.defaultPrevented){
-    if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name+'/'])
+    if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name + getSeparator()])
     else fireEvent('commands', 'open', [file.path+file.name])
   }
 }
