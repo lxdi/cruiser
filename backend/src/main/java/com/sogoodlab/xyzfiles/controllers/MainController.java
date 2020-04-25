@@ -26,6 +26,7 @@ public class MainController {
     Logger log = LoggerFactory.getLogger(MainController.class);
 
     public static String DEFAULT_STATE_PATH = "/default/state.json";
+    public static String DEFAULT_STATE_PATH_WIN = "/default/state.win.json";
 
     @Value("${state.json.path}")
     String stateJsonPath;
@@ -63,9 +64,7 @@ public class MainController {
 
     private JSONObject getStateJson() {
         try {
-            JSONObject result = new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
-            markSystem(result);
-            return result;
+            return new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
         }catch (IOException e){
             throw new RuntimeException("Error while reading state json file: ", e);
         }
@@ -75,7 +74,7 @@ public class MainController {
         File stateJsonFile = new File(stateJsonPath);
         if(!stateJsonFile.exists()){
             log.warn(String.format("Didn't find a state file in %s; creating new from default", stateJsonFile));
-            try(InputStream is = this.getClass().getResourceAsStream(DEFAULT_STATE_PATH)){
+            try(InputStream is = getDefaultStateFileIS()){
                 FileUtils.copyInputStreamToFile(is, stateJsonFile);
             } catch (IOException e){
                 throw new RuntimeException(e);
@@ -84,26 +83,29 @@ public class MainController {
         return stateJsonFile;
     }
 
-    private void markSystem(JSONObject jsonObject){
-        if(!jsonObject.has("system")){
-            jsonObject.put("system", System.getProperty("os.name"));
+    private InputStream getDefaultStateFileIS(){
+        if(System.getProperty("os.name").toLowerCase().contains("windows")){
+            return this.getClass().getResourceAsStream(DEFAULT_STATE_PATH_WIN);
+        } else {
+            return this.getClass().getResourceAsStream(DEFAULT_STATE_PATH);
         }
     }
 
     private List<String> getCommand(String path){
-        List<String> result = new ArrayList<>(Arrays.asList("mimeopen", "-n"));
         JSONObject stateJson = getStateJson();
-        List<String> byExt = checkByExt(path, stateJson);
-        if(byExt!=null){
-            result = byExt;
-        } else {
-            result = Optional.ofNullable(checkByMimeType(path, stateJson)).orElse(result);
+        List<String> result = commandByExt(path, stateJson);
+        if(result == null) {
+            result = Optional.ofNullable(commandByMimeType(path, stateJson)).orElse(getDefaultCommand(stateJson));
         }
         result.add(path);
         return result;
     }
 
-    private List<String> checkByExt(String path, JSONObject stateJson){
+    private List<String> getDefaultCommand(JSONObject stateJson){
+        return toList(stateJson.getJSONObject("commands").getJSONArray("default"));
+    }
+
+    private List<String> commandByExt(String path, JSONObject stateJson){
         String extension = getExtension(path);
         if(extension==null){
             return null;
@@ -119,7 +121,7 @@ public class MainController {
         return null;
     }
 
-    private List<String> checkByMimeType(String path, JSONObject stateJson){
+    private List<String> commandByMimeType(String path, JSONObject stateJson){
         String mimeType = getTypeMime(path);
         JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
         for(int i = 0; i<mappings.length(); i++){

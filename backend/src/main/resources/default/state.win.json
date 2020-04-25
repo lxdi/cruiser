@@ -1,0 +1,22 @@
+{
+  "system": "windows",
+  "bookmarks": [
+    {
+      "name": "Root",
+      "path": "\\",
+      "type": "dir"
+    }
+  ],
+  "panels": {
+    "left": {
+      "cwd": "\\"
+    },
+    "right": {
+      "cwd": "\\"
+    }
+  },
+  "commands": {
+    "default": ["explorer.exe"],
+    "type-mappings": []
+  }
+}
