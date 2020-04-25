@@ -16,11 +16,8 @@ export class FileModal extends React.Component{
       stSetter('isOpen', true)
       this.setState({})
     })
-    registerEvent('file-modal', 'close', (stSetter)=>{
-      stSetter('current', null)
-      stSetter('isOpen', false)
-      this.setState({})
-    })
+    registerEvent('file-modal', 'close', (stSetter)=>doClose(this, stSetter))
+    registerReaction('file-modal', 'commands', 'deleted', (stSetter)=>doClose(this, stSetter))
   }
 
   render(){
@@ -34,9 +31,16 @@ export class FileModal extends React.Component{
               TODO
             </div>
             <Modal.Footer>
-              <Button onClick={()=>fireEvent('file-modal', 'close')} bsStyle="primary">Close</Button>
+              <Button onClick={()=>fireEvent('commands', 'delete', [file.path+file.name])} variant="danger">Delete</Button>
+              <Button onClick={()=>fireEvent('file-modal', 'close')} variant="primary">Close</Button>
             </Modal.Footer>
       </Modal>
     )
   }
+}
+
+const doClose = function(comp, stSetter){
+  stSetter('current', null)
+  stSetter('isOpen', false)
+  comp.setState({})
 }

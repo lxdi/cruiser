@@ -14,6 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,10 @@ public class MainController {
     public static String DEFAULT_STATE_PATH_WIN = "/default/state.win.json";
 
     @Value("${state.json.path}")
-    String stateJsonPath;
+    private String stateJsonPath;
+
+    @Value("${trash.bucket.bookmark}")
+    private String trashBookmark;
 
     @PostMapping("/file/get/all")
     public @ResponseBody List<FileDto> files(@RequestBody String path){
@@ -62,6 +66,23 @@ public class MainController {
         return "Seccess";
     }
 
+    @PostMapping("/command/trash/move")
+    public @ResponseBody String delete(@RequestBody String path) throws IOException {
+
+        File fileToRemove = new File(path);
+        if(!fileToRemove.exists()){
+            throw new FileNotFoundException("File " + fileToRemove.getName() + " doesn't exist");
+        }
+        Files.move(Paths.get(path), Paths.get(getTrashPath()+fileToRemove.getName()), StandardCopyOption.REPLACE_EXISTING);
+        return "Ok";
+    }
+
+    @PostMapping("/command/trash/clean")
+    public @ResponseBody String cleanTrash() throws IOException {
+        FileUtils.cleanDirectory(new File(getTrashPath()));
+        return "Ok";
+    }
+
     private JSONObject getStateJson() {
         try {
             return new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
@@ -89,6 +110,17 @@ public class MainController {
         } else {
             return this.getClass().getResourceAsStream(DEFAULT_STATE_PATH);
         }
+    }
+
+    private String getTrashPath(){
+        JSONObject stateJson = getStateJson();
+        JSONArray bookmarks = stateJson.getJSONArray("bookmarks");
+        for(int i=0; i<bookmarks.length(); i++){
+            if(bookmarks.getJSONObject(i).getString("name").equals(trashBookmark)){
+                return bookmarks.getJSONObject(i).getString("path");
+            }
+        }
+        throw new RuntimeException("Didn't find Trash bookmark");
     }
 
     private List<String> getCommand(String path){

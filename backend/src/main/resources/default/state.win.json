@@ -5,6 +5,11 @@
       "name": "Root",
       "path": "\\",
       "type": "dir"
+    },
+    {
+      "name": "Trash",
+      "path": "\\trash",
+      "type": "dir"
     }
   ],
   "panels": {

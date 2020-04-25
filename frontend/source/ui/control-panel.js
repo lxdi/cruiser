@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Button} from 'react-bootstrap'
+
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
 export class ControlPanel extends React.Component {
@@ -38,9 +40,15 @@ const getBookmarksUI = function(comp){
   }
   return <div>
           {dirBookmarks}
-          <div> -/- </div>
+          {getDeviderUI()}
           {fileBookmarks}
+          {getDeviderUI()}
+          <Button variant='warning' size='sm' onClick={()=>fireEvent('commands', 'clean-trash')}>Clean trash</Button>
         </div>
+}
+
+const getDeviderUI = function(){
+  return <div style={{'borderBottom': '1px solid lightgrey', 'margin': '5px'}}> </div>
 }
 
 const getCurrentPanel = function(){
