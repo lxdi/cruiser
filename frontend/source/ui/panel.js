@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Button} from 'react-bootstrap'
+import {Button, Form} from 'react-bootstrap'
 
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
@@ -15,13 +15,13 @@ export class Panel extends React.Component {
     this.state = {
       panelName : 'panel-' + props.name
     }
-    registerObject(this.state.panelName, {'current': props.current})
+    registerObject(this.state.panelName, {'current': props.current, 'selected':[]})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
+    registerEvent(this.state.panelName, 'select', (stSetter, file)=>{chkSt(this.state.panelName, 'selected').push(file); this.setState({})})
     registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
-    //fireEvent('files-rep', 'get-files-by-path', [chkSt(this.state.panelName, 'cwd')])
   }
 
   render(){
@@ -39,7 +39,10 @@ export class Panel extends React.Component {
 
 const handleChangeDir = function(comp, stSetter, newCwd){
   chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
-  fireEvent('files-rep', 'get-files-by-path', [newCwd])
+  stSetter('selected', [])
+  if(chkSt('files-rep', newCwd)==null){
+    fireEvent('files-rep', 'get-files-by-path', [newCwd])
+  }
   fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
   comp.setState({})
 }
@@ -51,10 +54,7 @@ const handleBack = function(comp, stSetter){
     newCwd = cwd.substring(0, cwd.lastIndexOf(getSeparator()))
     newCwd = newCwd.substring(0, newCwd.lastIndexOf(getSeparator()))+getSeparator()
   }
-  chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
-  fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
-  //fireEvent('files-rep', 'get-files-by-path', [newCwd])
-  comp.setState({})
+  handleChangeDir(comp, stSetter, newCwd)
 }
 
 const getSeparator = function(){
@@ -83,12 +83,9 @@ const getFilesUI = function(comp){
     })
     return <table style={{'width': '100%'}}>
               <tr class='file-div'>
-                <td>
-                  <div onClick={()=>fireEvent(comp.state.panelName, 'back')}> <a href="#" > .. </a></div>
+                <td colspan='5'>
+                  <div onClick={()=>{fireEvent(comp.state.panelName, 'back')}}> <a href="#" > .. </a></div>
                 </td>
-                <td></td>
-                <td></td>
-                <td></td>
               </tr>
               {dirsUI}
               {filesUI}
@@ -98,14 +95,20 @@ const getFilesUI = function(comp){
     return 'Loading...'
   }
 }
-// /onClick={()=>hanldeFileEntryClick(comp, file)}
+
 const getFileEntryTrUI = function(comp, file){
-  return <tr class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
+  const panelName = comp.state.panelName
+  return <tr id={file.name} class='file-div' style={{'background-color': isSelected(comp, file)? 'lightBlue':'none'}} onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
+            <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
             <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}>More</a></td>
         </tr>
+}
+
+const isSelected = function(comp, file){
+  return chkSt(comp.state.panelName, 'selected').includes(file)?true:false
 }
 
 const hanldeFileEntryClick = function(comp, file, event){

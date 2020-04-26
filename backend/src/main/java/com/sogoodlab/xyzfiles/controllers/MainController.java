@@ -68,7 +68,6 @@ public class MainController {
 
     @PostMapping("/command/trash/move")
     public @ResponseBody String delete(@RequestBody String path) throws IOException {
-
         File fileToRemove = new File(path);
         if(!fileToRemove.exists()){
             throw new FileNotFoundException("File " + fileToRemove.getName() + " doesn't exist");

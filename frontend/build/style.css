@@ -2,9 +2,18 @@
   border-bottom: 1px solid lightgrey;
 }
 
+.file-td {
+  padding: 0px;
+}
+
 .file-div:hover {
   border: 1px solid green;
   background: ivory;
+}
+
+.bullet:hover {
+  border: 1px solid cyan;
+  border-radius: 5px
 }
 
 .main-table {
