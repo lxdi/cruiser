@@ -1,6 +1,8 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {sendPost} from './postoffice'
 
+import {getTrashBookmark} from '../services/stateUtils'
+
 registerObject('files-rep', {})
 
 registerEvent('files-rep', 'get-files-by-path', (stateSetter, path)=>{
@@ -9,4 +11,9 @@ registerEvent('files-rep', 'get-files-by-path', (stateSetter, path)=>{
 
 registerEvent('files-rep', 'files-received', (stSetter, path, files)=>{
   stSetter(path, files)
+})
+
+registerReaction('files-rep', 'commands', 'delete', (stSetter, path)=>{
+  stSetter(path, null)
+  stSetter(getTrashBookmark().path, null)
 })

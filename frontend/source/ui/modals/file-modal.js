@@ -21,17 +21,17 @@ export class FileModal extends React.Component{
   }
 
   render(){
-    const file = chkSt('file-modal', 'current')
+    const current = chkSt('file-modal', 'current')
     return (
       <Modal show={chkSt('file-modal', 'isOpen')} dialogClassName='file-modal-style'>
             <Modal.Header>
-              <Modal.Title>File details {file!=null? file.name :''}</Modal.Title>
+              <Modal.Title>File(s) details</Modal.Title>
             </Modal.Header>
             <div style={{margin:'5px'}}>
-              TODO
+              {getModalBody(current)}
             </div>
             <Modal.Footer>
-              <Button onClick={()=>fireEvent('commands', 'delete', [file.path+file.name])} variant="danger">Delete</Button>
+              <Button onClick={()=>fireEvent('commands', 'delete', [current])} variant="danger">Delete</Button>
               <Button onClick={()=>fireEvent('file-modal', 'close')} variant="primary">Close</Button>
             </Modal.Footer>
       </Modal>
@@ -43,4 +43,21 @@ const doClose = function(comp, stSetter){
   stSetter('current', null)
   stSetter('isOpen', false)
   comp.setState({})
+}
+
+const getModalBody = function(current){
+  if(current==null){
+    return 'TODO'
+  }
+  if(Array.isArray(current)){
+    return getFilesIU(current)
+  } else {
+    return current.name
+  }
+}
+
+const getFilesIU = function(current){
+  const result = []
+  current.forEach(f=>result.push(<div>{f.name}</div>))
+  return <div>{result}</div>
 }

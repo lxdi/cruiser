@@ -67,14 +67,32 @@ public class MainController {
     }
 
     @PostMapping("/command/trash/move")
-    public @ResponseBody String delete(@RequestBody String path) throws IOException {
+    public @ResponseBody String delete(@RequestBody FileDto file) throws IOException {
+        moveToTrash(file.getPath()+file.getName());
+        return "Ok";
+    }
+
+    @PostMapping("/command/trash/move/multiple")
+    public @ResponseBody String multiDelete(@RequestBody List<FileDto> files){
+        for(FileDto file : files){
+            try{
+                moveToTrash(file.getPath()+file.getName());
+            } catch (IOException e){
+                log.error(e.getMessage(), e);
+            }
+        }
+        return "Ok";
+    }
+
+    private void moveToTrash(String path) throws IOException {
         File fileToRemove = new File(path);
         if(!fileToRemove.exists()){
             throw new FileNotFoundException("File " + fileToRemove.getName() + " doesn't exist");
         }
+        log.info("Move to trash dir {}", path);
         Files.move(Paths.get(path), Paths.get(getTrashPath()+fileToRemove.getName()), StandardCopyOption.REPLACE_EXISTING);
-        return "Ok";
     }
+
 
     @PostMapping("/command/trash/clean")
     public @ResponseBody String cleanTrash() throws IOException {

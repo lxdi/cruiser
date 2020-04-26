@@ -18,19 +18,11 @@ export class Panel extends React.Component {
     registerObject(this.state.panelName, {'current': props.current, 'selected':[]})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
-    registerEvent(this.state.panelName, 'select', (stSetter, file)=>{
-      const selectedArr = chkSt(this.state.panelName, 'selected')
-      if(selectedArr.includes(file)){
-        selectedArr.splice(selectedArr.indexOf(file), 1)
-        console.log('unselect', selectedArr, chkSt(this.state.panelName, 'selected'))
-      } else {
-        selectedArr.push(file)
-      }
-      this.setState({})
-    })
+    registerEvent(this.state.panelName, 'select', (stSetter, file)=>handleSelect(this, stSetter, file))
     registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
+    registerReaction(this.state.panelName, 'commands', 'deleted', ()=>this.setState({}))
   }
 
   render(){
@@ -64,6 +56,16 @@ const handleBack = function(comp, stSetter){
     newCwd = newCwd.substring(0, newCwd.lastIndexOf(getSeparator()))+getSeparator()
   }
   handleChangeDir(comp, stSetter, newCwd)
+}
+
+const handleSelect = function(comp, stSetter, file){
+  const selectedArr = chkSt(comp.state.panelName, 'selected')
+  if(selectedArr.includes(file)){
+    selectedArr.splice(selectedArr.indexOf(file), 1)
+  } else {
+    selectedArr.push(file)
+  }
+  comp.setState({})
 }
 
 const getSeparator = function(){
@@ -107,14 +109,16 @@ const getFilesUI = function(comp){
 
 const getFileEntryTrUI = function(comp, file){
   const panelName = comp.state.panelName
-  const isSelected = chkSt(comp.state.panelName, 'selected').includes(file)
+  const selected = chkSt(comp.state.panelName, 'selected')
+  const isSelected = selected.includes(file)
   const style = isSelected? {'background-color': 'lightBlue'}: {}
+  const toModal = selected.length>0? selected: file
   return <tr id={file.name+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
-            <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}>More</a></td>
+            <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [toModal]); event.preventDefault()}}>More</a></td>
         </tr>
 }
 
