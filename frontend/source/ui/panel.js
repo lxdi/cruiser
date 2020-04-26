@@ -18,7 +18,16 @@ export class Panel extends React.Component {
     registerObject(this.state.panelName, {'current': props.current, 'selected':[]})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
-    registerEvent(this.state.panelName, 'select', (stSetter, file)=>{chkSt(this.state.panelName, 'selected').push(file); this.setState({})})
+    registerEvent(this.state.panelName, 'select', (stSetter, file)=>{
+      const selectedArr = chkSt(this.state.panelName, 'selected')
+      if(selectedArr.includes(file)){
+        selectedArr.splice(selectedArr.indexOf(file), 1)
+        console.log('unselect', selectedArr, chkSt(this.state.panelName, 'selected'))
+      } else {
+        selectedArr.push(file)
+      }
+      this.setState({})
+    })
     registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
@@ -98,17 +107,15 @@ const getFilesUI = function(comp){
 
 const getFileEntryTrUI = function(comp, file){
   const panelName = comp.state.panelName
-  return <tr id={file.name} class='file-div' style={{'background-color': isSelected(comp, file)? 'lightBlue':'none'}} onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
+  const isSelected = chkSt(comp.state.panelName, 'selected').includes(file)
+  const style = isSelected? {'background-color': 'lightBlue'}: {}
+  return <tr id={file.name+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
             <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [file]); event.preventDefault()}}>More</a></td>
         </tr>
-}
-
-const isSelected = function(comp, file){
-  return chkSt(comp.state.panelName, 'selected').includes(file)?true:false
 }
 
 const hanldeFileEntryClick = function(comp, file, event){

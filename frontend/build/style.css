@@ -8,7 +8,7 @@
 
 .file-div:hover {
   border: 1px solid green;
-  background: ivory;
+  background-color: ivory;
 }
 
 .bullet:hover {
