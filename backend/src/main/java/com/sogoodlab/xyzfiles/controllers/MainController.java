@@ -68,7 +68,7 @@ public class MainController {
 
     @PostMapping("/command/trash/move")
     public @ResponseBody String delete(@RequestBody FileDto file) throws IOException {
-        moveToTrash(file.getPath()+file.getName());
+        moveToTrash(file.getPath());
         return "Ok";
     }
 
@@ -76,11 +76,17 @@ public class MainController {
     public @ResponseBody String multiDelete(@RequestBody List<FileDto> files){
         for(FileDto file : files){
             try{
-                moveToTrash(file.getPath()+file.getName());
+                moveToTrash(file.getPath());
             } catch (IOException e){
                 log.error(e.getMessage(), e);
             }
         }
+        return "Ok";
+    }
+
+    @PostMapping("/command/trash/clean")
+    public @ResponseBody String cleanTrash() throws IOException {
+        FileUtils.cleanDirectory(new File(getTrashPath()));
         return "Ok";
     }
 
@@ -91,13 +97,6 @@ public class MainController {
         }
         log.info("Move to trash dir {}", path);
         Files.move(Paths.get(path), Paths.get(getTrashPath()+fileToRemove.getName()), StandardCopyOption.REPLACE_EXISTING);
-    }
-
-
-    @PostMapping("/command/trash/clean")
-    public @ResponseBody String cleanTrash() throws IOException {
-        FileUtils.cleanDirectory(new File(getTrashPath()));
-        return "Ok";
     }
 
     private JSONObject getStateJson() {

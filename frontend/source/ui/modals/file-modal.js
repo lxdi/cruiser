@@ -5,6 +5,9 @@ import {Modal, Button} from 'react-bootstrap'
 
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
+import {getName} from '../../services/pathUtils'
+import {getSeparator} from '../../services/separator'
+
 //props: title, isOpen, okHandler, cancelHandler, styleClass
 export class FileModal extends React.Component{
   constructor(props){
@@ -52,12 +55,12 @@ const getModalBody = function(current){
   if(Array.isArray(current)){
     return getFilesIU(current)
   } else {
-    return current.name
+    return getName(current.path, getSeparator())
   }
 }
 
 const getFilesIU = function(current){
   const result = []
-  current.forEach(f=>result.push(<div>{f.name}</div>))
+  current.forEach(f=>result.push(<div>{getName(f.path, getSeparator())}</div>))
   return <div>{result}</div>
 }

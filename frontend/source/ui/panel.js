@@ -4,9 +4,10 @@ import {Button, Form} from 'react-bootstrap'
 
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
-registerEvent('panels', 'switch-current', ()=>{})
+import {getPath, getName, isDir} from '../services/pathUtils'
+import {getSeparator} from '../services/separator'
 
-var separator = null
+registerEvent('panels', 'switch-current', ()=>{})
 
 export class Panel extends React.Component {
   constructor(props){
@@ -52,8 +53,9 @@ const handleBack = function(comp, stSetter){
   const cwd = chkSt('gstate', 'stateObj').panels[comp.props.name].cwd
   var newCwd = getSeparator()
   if(cwd!=getSeparator() && cwd.lastIndexOf(getSeparator())>0){
-    newCwd = cwd.substring(0, cwd.lastIndexOf(getSeparator()))
-    newCwd = newCwd.substring(0, newCwd.lastIndexOf(getSeparator()))+getSeparator()
+    // newCwd = cwd.substring(0, cwd.lastIndexOf(getSeparator()))
+    // newCwd = newCwd.substring(0, newCwd.lastIndexOf(getSeparator()))+getSeparator()
+    newCwd = getPath(cwd, getSeparator())
   }
   handleChangeDir(comp, stSetter, newCwd)
 }
@@ -68,17 +70,6 @@ const handleSelect = function(comp, stSetter, file){
   comp.setState({})
 }
 
-const getSeparator = function(){
-  if(separator==null){
-    if(chkSt('gstate', 'stateObj').system.toLowerCase().includes('windows')){
-      separator = '\\'
-    } else {
-      separator = '/'
-    }
-  }
-  return separator
-}
-
 const getFilesUI = function(comp){
   const files = chkSt('files-rep', chkSt('gstate', 'stateObj').panels[comp.props.name].cwd)
   if(files!=null){
@@ -86,7 +77,7 @@ const getFilesUI = function(comp){
     const filesUI = []//files.map(f => <div> <a href="#">{f.name} </a></div>)
     files.sort((f1, f2) => sortByLong(f1.lastModified, f2.lastModified, 'desc'))
     files.forEach(f => {
-      if(f.isDir){
+      if(isDir(f.path, getSeparator())){
         dirsUI.push(getFileEntryTrUI(comp, f))
       } else {
         filesUI.push(getFileEntryTrUI(comp, f))
@@ -113,7 +104,7 @@ const getFileEntryTrUI = function(comp, file){
   const isSelected = selected.includes(file)
   const style = isSelected? {'background-color': 'lightBlue'}: {}
   const toModal = selected.length>0? selected: file
-  return <tr id={file.name+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
+  return <tr id={getName(file.path, getSeparator())+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
@@ -124,16 +115,16 @@ const getFileEntryTrUI = function(comp, file){
 
 const hanldeFileEntryClick = function(comp, file, event){
   if(!event.defaultPrevented){
-    if(file.isDir) fireEvent(comp.state.panelName, 'change-dir', [file.path + file.name + getSeparator()])
-    else fireEvent('commands', 'open', [file.path+file.name])
+    if(isDir(file.path, getSeparator())) fireEvent(comp.state.panelName, 'change-dir', [file.path])
+    else fireEvent('commands', 'open', [file.path])
   }
 }
 
 const getFileNameUI = function(file){
-  if(file.isDir){
-    return <div class='file-link' style={{'color': 'orange'}}>[{file.name}]</div>
+  if(isDir(file.path, getSeparator())){
+    return <div class='file-link' style={{'color': 'orange'}}>[{getName(file.path, getSeparator())}]</div>
   } else {
-    return <div class='file-link' style={{'color': 'grey'}}>{file.name} </div>
+    return <div class='file-link' style={{'color': 'grey'}}>{getName(file.path, getSeparator())} </div>
   }
 }
 
