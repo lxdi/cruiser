@@ -13,7 +13,7 @@ registerEvent('files-rep', 'files-received', (stSetter, path, files)=>{
   stSetter(path, files)
 })
 
-registerReaction('files-rep', 'commands', 'delete', (stSetter, path)=>{
-  stSetter(path, null)
+registerReaction('files-rep', 'commands', ['delete', 'copy', 'move', 'rename'], (stSetter, paths)=>{
+  paths.forEach(path => stSetter(path, null))
   stSetter(getTrashBookmark().path, null)
 })

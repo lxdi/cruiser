@@ -15,10 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -88,6 +85,53 @@ public class MainController {
     public @ResponseBody String cleanTrash() throws IOException {
         FileUtils.cleanDirectory(new File(getTrashPath()));
         return "Ok";
+    }
+
+    @PostMapping("/command/copy")
+    public @ResponseBody String copy(@RequestBody Map<String, Object> requisites) throws IOException {
+        List<String> pathsSource = (List<String>) requisites.get("from");
+        String targetPath = (String) requisites.get("to");
+        pathsSource.forEach(path -> copyMove(path, targetPath, "copy"));
+        return "OK";
+    }
+
+    @PostMapping("/command/move")
+    public @ResponseBody String move(@RequestBody Map<String, Object> requisites) throws IOException {
+        List<String> pathsSource = (List<String>) requisites.get("from");
+        String targetPath = (String) requisites.get("to");
+        pathsSource.forEach(path -> copyMove(path, targetPath, "move"));
+        return "OK";
+    }
+
+    @PostMapping("/command/rename")
+    public @ResponseBody String rename(@RequestBody Map<String, String> requisites) throws IOException {
+        File file = new File(requisites.get("path"));
+        String newName = requisites.get("newName");
+        String newPath = file.getParent()+File.separator+newName;
+        log.info("Rename {} to {}", file.getAbsoluteFile(), newPath);
+        Files.move(file.toPath(), Paths.get(newPath));
+        return "OK";
+    }
+
+    private void copyMove(String source, String target, String operationType){
+        File sourceFile = new File(source);
+        try {
+            if(target == null){
+                throw new NullPointerException("Target is null");
+            }
+            switch (operationType) {
+                case "copy":
+                    log.info("Copy {} to {}", source, target);
+                    Files.copy(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    break;
+                case "move":
+                    log.info("Move {} to {}", source, target);
+                    Files.move(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    break;
+            }
+        } catch (IOException e){
+            log.error("Error while {} {} to {}", operationType, source, target, e);
+        }
     }
 
     private void moveToTrash(String path) throws IOException {

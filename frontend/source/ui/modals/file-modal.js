@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 // import Modal from 'react-modal';
-import {Modal, Button} from 'react-bootstrap'
+import {Modal, Button, Form} from 'react-bootstrap'
 
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 
-import {getName} from '../../services/pathUtils'
+import {getName, getPath, isDir} from '../../services/pathUtils'
 import {getSeparator} from '../../services/separator'
 
 //props: title, isOpen, okHandler, cancelHandler, styleClass
@@ -14,32 +14,37 @@ export class FileModal extends React.Component{
     super(props)
 
     registerObject('file-modal', {isOpen: false})
-    registerEvent('file-modal', 'open', (stSetter, current)=>{
-      stSetter('current', current)
-      stSetter('isOpen', true)
-      this.setState({})
-    })
+    registerEvent('file-modal', 'open', (stSetter, files, panelName)=>doOpen(this, stSetter, files, panelName))
     registerEvent('file-modal', 'close', (stSetter)=>doClose(this, stSetter))
-    registerReaction('file-modal', 'commands', 'deleted', (stSetter)=>doClose(this, stSetter))
+    registerReaction('file-modal', 'commands', ['deleted', 'copied', 'moved', 'renamed'], (stSetter)=>doClose(this, stSetter))
   }
 
   render(){
-    const current = chkSt('file-modal', 'current')
+    const files = chkSt('file-modal', 'files')
     return (
       <Modal show={chkSt('file-modal', 'isOpen')} dialogClassName='file-modal-style'>
             <Modal.Header>
               <Modal.Title>File(s) details</Modal.Title>
             </Modal.Header>
             <div style={{margin:'5px'}}>
-              {getModalBody(current)}
+              {getModalBody(this, files)}
             </div>
             <Modal.Footer>
-              <Button onClick={()=>fireEvent('commands', 'delete', [current])} variant="danger">Delete</Button>
-              <Button onClick={()=>fireEvent('file-modal', 'close')} variant="primary">Close</Button>
+              {chkSt('file-modal', 'isOpen')? getFooterButtonsUI(this, files):''}
             </Modal.Footer>
       </Modal>
     )
   }
+}
+
+const doOpen = function(comp, stSetter, files, panelName){
+  stSetter('files', files)
+  stSetter('panelName', panelName)
+  stSetter('isOpen', true)
+  if(files!=null && files.length==1){
+    comp.setState({newName: getName(files[0].path)})
+  }
+  comp.setState({})
 }
 
 const doClose = function(comp, stSetter){
@@ -48,19 +53,56 @@ const doClose = function(comp, stSetter){
   comp.setState({})
 }
 
-const getModalBody = function(current){
-  if(current==null){
-    return 'TODO'
+const getModalBody = function(comp, files){
+  if(files==null){
+    return ''
   }
-  if(Array.isArray(current)){
-    return getFilesIU(current)
+  if(files.length>1){
+    return getFilesIU(files)
   } else {
-    return getName(current.path, getSeparator())
+    return getSingleFileIU(comp, files[0])
   }
 }
 
-const getFilesIU = function(current){
+const getSingleFileIU = function(comp){
+  return <Form.Control
+      type="text"
+      value={comp.state.newName}
+      placeholder={"Enter placeholder"}
+      onChange={(e)=>changeNameHandler(comp, e)}/>
+}
+
+const changeNameHandler = function(comp, e){
+  const newName = e.target.value
+  if(newName.includes(getSeparator())){
+    return
+  }
+  comp.setState({rename: true, newName: newName})
+}
+
+const getFilesIU = function(files){
   const result = []
-  current.forEach(f=>result.push(<div>{getName(f.path, getSeparator())}</div>))
+  files.forEach(f=>result.push(<div>{getName(f.path)}</div>))
   return <div>{result}</div>
+}
+
+const getFooterButtonsUI = function(comp, files){
+  const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(chkSt('file-modal', 'panelName'))].cwd
+  const filesPaths = []
+  files.forEach(f => filesPaths.push(f.path))
+  return [
+    comp.state.rename!=null && comp.state.newName!=''? <Button id='rename' onClick={()=>fireEvent('commands', 'rename', [files[0].path, comp.state.newName])} variant="info">Rename</Button>:null,
+    <Button id='copy' onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])} variant="success">Copy</Button>,
+    <Button id='move' onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])} variant="warning">Move</Button>,
+    <Button id='delete' onClick={()=>fireEvent('commands', 'delete', [current])} variant="danger">Delete</Button>,
+    <Button id='close' onClick={()=>fireEvent('file-modal', 'close')} variant="primary">Close</Button>
+  ]
+}
+
+const getOppositePanelNameShort = function(currentPanelName){
+  if(currentPanelName == 'panel-left'){
+    return 'right'
+  } else {
+    return 'left'
+  }
 }
