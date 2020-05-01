@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import {Button} from 'react-bootstrap'
-
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
+import {getOppositePanelNameShort, getCurrentPanel} from './panel'
 
 export class ControlPanel extends React.Component {
   constructor(props){
     super(props)
 
     registerReaction('control-panel', 'gstate', 'got', ()=>this.setState({}))
+    registerReaction('control-panel', 'panel-left', 'select', ()=>this.setState({}))
+    registerReaction('control-panel', 'panel-right', 'select', ()=>this.setState({}))
+    registerReaction('control-panel', 'panels', 'switch-current', ()=>this.setState({}))
+    registerReaction('control-panel', 'commands', ['deleted', 'copied', 'moved', 'renamed'], ()=>this.setState({}))
   }
 
   render(){
@@ -44,6 +47,8 @@ const getBookmarksUI = function(comp){
           {fileBookmarks}
           {getDeviderUI()}
           <Button variant='warning' size='sm' onClick={()=>fireEvent('commands', 'clean-trash')}>Clean trash</Button>
+          {getDeviderUI()}
+          {getPanelSpecificControlsUI()}
         </div>
 }
 
@@ -51,10 +56,17 @@ const getDeviderUI = function(){
   return <div style={{'borderBottom': '1px solid lightgrey', 'margin': '5px'}}> </div>
 }
 
-const getCurrentPanel = function(){
-  if(chkSt('panel-left', 'current')){
-    return 'panel-left'
-  } else {
-    return 'panel-right'
+const getPanelSpecificControlsUI = function(){
+  const selected = chkSt(getCurrentPanel(), 'selected')
+  if(selected!=null && selected.length>0){
+    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(getCurrentPanel())].cwd
+    const filesPaths = []
+    selected.forEach(f => filesPaths.push(f.path))
+    const buttonStyle = {marginTop:'3px', width: '100px'}
+    return <div>
+              <div style={buttonStyle}><Button variant='success' size='sm' block onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])}>Copy</Button></div>
+              <div style={buttonStyle}><Button variant='warning' size='sm' block onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])}>Move</Button></div>
+              <div style={buttonStyle}><Button variant='danger' size='sm' block onClick={()=>fireEvent('commands', 'delete', [selected])}>Delete</Button></div>
+          </div>
   }
 }

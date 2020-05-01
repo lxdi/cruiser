@@ -2,11 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import Modal from 'react-modal';
 import {Modal, Button, Form} from 'react-bootstrap'
-
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-
 import {getName, getPath, isDir} from '../../services/pathUtils'
 import {getSeparator} from '../../services/separator'
+import {getOppositePanelNameShort} from './../panel'
 
 //props: title, isOpen, okHandler, cancelHandler, styleClass
 export class FileModal extends React.Component{
@@ -94,15 +93,7 @@ const getFooterButtonsUI = function(comp, files){
     comp.state.rename!=null && comp.state.newName!=''? <Button id='rename' onClick={()=>fireEvent('commands', 'rename', [files[0].path, comp.state.newName])} variant="info">Rename</Button>:null,
     <Button id='copy' onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])} variant="success">Copy</Button>,
     <Button id='move' onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])} variant="warning">Move</Button>,
-    <Button id='delete' onClick={()=>fireEvent('commands', 'delete', [current])} variant="danger">Delete</Button>,
+    <Button id='delete' onClick={()=>fireEvent('commands', 'delete', [files])} variant="danger">Delete</Button>,
     <Button id='close' onClick={()=>fireEvent('file-modal', 'close')} variant="primary">Close</Button>
   ]
-}
-
-const getOppositePanelNameShort = function(currentPanelName){
-  if(currentPanelName == 'panel-left'){
-    return 'right'
-  } else {
-    return 'left'
-  }
 }

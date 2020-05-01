@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button, Form} from 'react-bootstrap'
-
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-
 import {getPath, getName, isDir} from '../services/pathUtils'
 import {getSeparator} from '../services/separator'
 
@@ -18,14 +16,13 @@ export class Panel extends React.Component {
     this.state = {
       panelName : panelNamePrefix + props.name
     }
-    registerObject(this.state.panelName, {'current': props.current, 'selected':[]})
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
     registerEvent(this.state.panelName, 'select', (stSetter, file)=>handleSelect(this, stSetter, file))
     registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
-    registerReaction(this.state.panelName, 'commands', ['deleted', 'copied', 'moved', 'renamed'], ()=>this.setState({}))
+    registerReaction(this.state.panelName, 'commands', ['deleted', 'copied', 'moved', 'renamed'], (stSetter)=>{stSetter('selected', []);this.setState({})})
   }
 
   render(){
@@ -66,6 +63,9 @@ const handleSelect = function(comp, stSetter, file){
     selectedArr.splice(selectedArr.indexOf(file), 1)
   } else {
     selectedArr.push(file)
+  }
+  if(!chkSt(comp.state.panelName, 'current')){
+    fireEvent('panels', 'switch-current')
   }
   comp.setState({})
 }
@@ -163,4 +163,20 @@ function formatBytes(bytes, decimals = 2) {
     const sizes = ['By', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+export const getOppositePanelNameShort = function(currentPanelName){
+  return getPanelNameShort(currentPanelName)=='left'? 'right':'left'
+}
+
+export const getPanelNameShort = function(panelName){
+  return panelName.substr(panelName.lastIndexOf('-') - panelName.length+1)
+}
+
+export const getCurrentPanel = function(){
+  if(chkSt('panel-left', 'current')){
+    return 'panel-left'
+  } else {
+    return 'panel-right'
+  }
 }

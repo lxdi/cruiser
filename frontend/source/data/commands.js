@@ -9,7 +9,7 @@ registerEvent('commands', 'open', (stSetter, path)=>{
 registerEvent('commands', 'delete', (stSetter, files)=>{
   if(Array.isArray(files)){
       sendPost('/command/trash/move/multiple', files, ()=>{fireEvent('commands', 'deleted')})
-      return [files[0].path]
+      return [getPath(files[0].path)]
   } else {
       sendPost('/command/trash/move', files, ()=>{fireEvent('commands', 'deleted')})
       return [getPath(files.path)]
