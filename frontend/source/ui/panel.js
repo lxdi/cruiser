@@ -126,10 +126,20 @@ const hanldeFileEntryClick = function(comp, file, event){
 
 const getFileNameUI = function(file){
   if(isDir(file.path)){
-    return <div class='file-link' style={{'color': 'orange'}}>[{getName(file.path)}]</div>
+    return <div class={'file-link ' + getClassForFile(file)}>[{getName(file.path)}]</div>
   } else {
-    return <div class='file-link' style={{'color': 'grey'}}>{getName(file.path)} </div>
+    return <div class={'file-link '+ getClassForFile(file)}>{getName(file.path)} </div>
   }
+}
+
+const getClassForFile = function(file){
+  const defaultClass = 'file-name-default'
+  if(file==null || file.mime==null) return defaultClass
+  if(file.mime == 'dir') return 'file-name-dir'
+  if(file.mime.includes('pdf')) return 'file-name-pdf'
+  if(file.mime.includes('video')) return 'file-name-video'
+  if(file.mime.includes('image')) return 'file-name-image'
+  return defaultClass
 }
 
 const getColorForSize = function(file){

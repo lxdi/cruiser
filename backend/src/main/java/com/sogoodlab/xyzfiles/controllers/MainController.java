@@ -210,7 +210,7 @@ public class MainController {
     }
 
     private List<String> commandByExt(String path, JSONObject stateJson){
-        String extension = getExtension(path);
+        String extension = util.FileUtils.getExtension(path);
         if(extension==null){
             return null;
         }
@@ -226,7 +226,7 @@ public class MainController {
     }
 
     private List<String> commandByMimeType(String path, JSONObject stateJson){
-        String mimeType = getTypeMime(path);
+        String mimeType = util.FileUtils.getTypeMime(path);
         JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
         for(int i = 0; i<mappings.length(); i++){
             JSONObject mapping = mappings.getJSONObject(i);
@@ -243,24 +243,6 @@ public class MainController {
             }
         }
         return null;
-    }
-
-    private static String getExtension(String path){
-        if(path.contains(".")){
-            return path.substring(path.lastIndexOf("."));
-        } else {
-            return null;
-        }
-    }
-
-    private String getTypeMime(String path) {
-        String mimeType = null;
-        try {
-            mimeType = Files.probeContentType(Paths.get(path));
-        } catch (IOException e) {
-            log.error("Error while reading mimetype on " + path, e);
-        }
-        return mimeType;
     }
 
     public static List<String> toList(JSONArray jsonArray){

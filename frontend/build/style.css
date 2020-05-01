@@ -51,6 +51,26 @@
   color: inherit;
 }
 
+.file-name-dir {
+  color: orange
+}
+
+.file-name-default {
+  color: grey
+}
+
+.file-name-video {
+  color: blue
+}
+
+.file-name-image {
+  color: violet
+}
+
+.file-name-pdf {
+  color: red
+}
+
 .file-modal-style {
   max-width: 100%;
   width:50%;
