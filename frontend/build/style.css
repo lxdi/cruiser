@@ -39,12 +39,25 @@
   font-size: 9pt;
 }
 
+.panel-current {
+  border: 2px solid blue
+}
+
+.panel-non-current {
+  border: 1px solid lightblue
+}
+
 .control-panel-main {
   margin: 3px;
   border: 1px solid green;
   border-radius: 10px;
   overflow: auto;
   height:97vh;
+}
+
+.file-modal-style {
+  max-width: 100%;
+  width:50%;
 }
 
 .file-link a:link {
@@ -71,7 +84,22 @@
   color: red
 }
 
-.file-modal-style {
-  max-width: 100%;
-  width:50%;
+.file-size-bt {
+  color: blue
+}
+
+.file-size-kb {
+  color: green
+}
+
+.file-size-mb {
+  color: orange
+}
+
+.file-size-gb {
+  color: red
+}
+
+.file-size-dt {
+  color: black
 }

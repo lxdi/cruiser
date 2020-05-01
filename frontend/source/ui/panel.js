@@ -28,7 +28,7 @@ export class Panel extends React.Component {
   render(){
     if(chkSt('gstate', 'stateObj')!=null){
       const cwd = chkSt('gstate', 'stateObj').panels[this.props.name].cwd
-      return <div class='panel-main' style={{"border": chkSt(this.state.panelName, 'current')==true?"2px solid blue":"1px solid lightblue"}}>
+      return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')}>
             <div onClick={()=>fireEvent('panels', 'switch-current')}>
               <span>{getPath(cwd)}</span>
               <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
@@ -111,7 +111,7 @@ const getFileEntryTrUI = function(comp, file){
   return <tr id={getName(file.path)+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
-            <td width='10%' style={{'color': getColorForSize(file)}}>{formatBytes(file.size)}</td>
+            <td width='10%' class={getStyleForSize(file)}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
             <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [toModal, comp.state.panelName]); event.preventDefault()}}>More</a></td>
         </tr>
@@ -142,12 +142,12 @@ const getClassForFile = function(file){
   return defaultClass
 }
 
-const getColorForSize = function(file){
-  if(file.size < 1024) return 'blue'
-  if(file.size < 1024000) return 'green'
-  if(file.size < 1024000000) return 'orange'
-  if(file.size < 1024000000000) return 'red'
-  return 'black'
+const getStyleForSize = function(file){
+  if(file.size < 1024) return 'file-size-bt'
+  if(file.size < 1024000) return 'file-size-kb'
+  if(file.size < 1024000000) return 'file-size-mb'
+  if(file.size < 1024000000000) return 'file-size-gb'
+  return 'file-size-dt'
 }
 
 const formatDate = function(date){
