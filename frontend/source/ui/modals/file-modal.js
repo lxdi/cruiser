@@ -1,13 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import Modal from 'react-modal';
 import {Modal, Button, Form} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {getName, getPath, isDir} from '../../services/pathUtils'
 import {getSeparator} from '../../services/separator'
 import {getOppositePanelNameShort} from './../panel'
 
-//props: title, isOpen, okHandler, cancelHandler, styleClass
 export class FileModal extends React.Component{
   constructor(props){
     super(props)

@@ -113,6 +113,18 @@ public class MainController {
         return "OK";
     }
 
+    @PostMapping("/command/create/dir")
+    public @ResponseBody String createDir(@RequestBody String path){
+        File dir = new File(path);
+        if(!dir.exists()){
+            log.info("Creating new directory {}", path);
+            dir.mkdir();
+        } else {
+            log.error("Directory already exists {}", path);
+        }
+        return "Ok";
+    }
+
     private void copyMove(String source, String target, String operationType){
         File sourceFile = new File(source);
         try {

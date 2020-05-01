@@ -42,3 +42,9 @@ registerEvent('commands', 'rename', (stSetter, path, newName)=>{
   return [getPath(path)]
 })
 registerEvent('commands', 'renamed', ()=>{})
+
+registerEvent('commands', 'create-new-dir', (stSetter, path)=>{
+  sendPost('/command/create/dir', path, ()=>fireEvent('commands', 'dir-created'))
+  return [getPath(path)]
+})
+registerEvent('commands', 'dir-created', ()=>{})

@@ -22,13 +22,17 @@ export class Panel extends React.Component {
     registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
-    registerReaction(this.state.panelName, 'commands', ['deleted', 'copied', 'moved', 'renamed'], (stSetter)=>{stSetter('selected', []);this.setState({})})
+    registerReaction(this.state.panelName, 'commands', ['deleted', 'copied', 'moved', 'renamed', 'dir-created'], (stSetter)=>{stSetter('selected', []);this.setState({})})
   }
 
   render(){
     if(chkSt('gstate', 'stateObj')!=null){
+      const cwd = chkSt('gstate', 'stateObj').panels[this.props.name].cwd
       return <div class='panel-main' style={{"border": chkSt(this.state.panelName, 'current')==true?"2px solid blue":"1px solid lightblue"}}>
-            <div onClick={()=>fireEvent('panels', 'switch-current')}>{chkSt('gstate', 'stateObj').panels[this.props.name].cwd}</div>
+            <div onClick={()=>fireEvent('panels', 'switch-current')}>
+              <span>{getPath(cwd)}</span>
+              <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
+            </div>
             <div>{getFilesUI(this)}</div>
           </div>
     } else {
@@ -179,4 +183,8 @@ export const getCurrentPanel = function(){
   } else {
     return 'panel-right'
   }
+}
+
+export const getCurrentPanelShort = function(){
+  return getPanelNameShort(getCurrentPanel())
 }

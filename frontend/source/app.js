@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import {Panel} from './ui/panel.js'
 import {ControlPanel} from './ui/control-panel'
 import {FileModal} from './ui/modals/file-modal'
+import {CreateNewModal} from './ui/modals/create-new-modal'
 
 import {registerObject, fireEvent} from 'absevents'
 
@@ -30,6 +31,7 @@ function rerender(){
 				</tr>
 			</table>
 			<FileModal />
+			<CreateNewModal />
 		</div>, app);
 }
 

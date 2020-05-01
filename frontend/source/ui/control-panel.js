@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-import {getOppositePanelNameShort, getCurrentPanel} from './panel'
+import {getCurrentPanelShort, getCurrentPanel} from './panel'
+
+const buttonStyle = {marginTop:'3px', width: '100px'}
 
 export class ControlPanel extends React.Component {
   constructor(props){
@@ -46,7 +48,10 @@ const getBookmarksUI = function(comp){
           {getDeviderUI()}
           {fileBookmarks}
           {getDeviderUI()}
-          <Button variant='warning' size='sm' onClick={()=>fireEvent('commands', 'clean-trash')}>Clean trash</Button>
+          <div>
+            <div style={buttonStyle}><Button variant='info' size='sm' block onClick={()=>fireEvent('create-new-modal', 'open')}>Create Dir</Button></div>
+            <div style={buttonStyle}><Button variant='warning' size='sm' block onClick={()=>fireEvent('commands', 'clean-trash')}>Clean trash</Button></div>
+          </div>
           {getDeviderUI()}
           {getPanelSpecificControlsUI()}
         </div>
@@ -59,10 +64,9 @@ const getDeviderUI = function(){
 const getPanelSpecificControlsUI = function(){
   const selected = chkSt(getCurrentPanel(), 'selected')
   if(selected!=null && selected.length>0){
-    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(getCurrentPanel())].cwd
+    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getCurrentPanelShort()].cwd
     const filesPaths = []
     selected.forEach(f => filesPaths.push(f.path))
-    const buttonStyle = {marginTop:'3px', width: '100px'}
     return <div>
               <div style={buttonStyle}><Button variant='success' size='sm' block onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])}>Copy</Button></div>
               <div style={buttonStyle}><Button variant='warning' size='sm' block onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])}>Move</Button></div>
