@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-import {getCurrentPanelShort, getCurrentPanel} from './panel'
+import {getOppositePanelNameShort, getCurrentPanel} from './panel'
 
 const buttonStyle = {marginTop:'3px', width: '100px'}
 
@@ -64,7 +64,7 @@ const getDeviderUI = function(){
 const getPanelSpecificControlsUI = function(){
   const selected = chkSt(getCurrentPanel(), 'selected')
   if(selected!=null && selected.length>0){
-    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getCurrentPanelShort()].cwd
+    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(getCurrentPanel())].cwd
     const filesPaths = []
     selected.forEach(f => filesPaths.push(f.path))
     return <div>
