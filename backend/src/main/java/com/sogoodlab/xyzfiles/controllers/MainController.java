@@ -138,7 +138,11 @@ public class MainController {
                     break;
                 case "move":
                     log.info("Move {} to {}", source, target);
-                    Files.move(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    if(sourceFile.isDirectory()){
+                        FileUtils.moveDirectory(sourceFile, new File(target+sourceFile.getName()));
+                    } else {
+                        Files.move(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    }
                     break;
             }
         } catch (IOException e){
