@@ -134,7 +134,11 @@ public class MainController {
             switch (operationType) {
                 case "copy":
                     log.info("Copy {} to {}", source, target);
-                    Files.copy(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    if(sourceFile.isDirectory()){
+                        FileUtils.copyDirectory(sourceFile, new File(target+sourceFile.getName()));
+                    } else {
+                        Files.copy(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    }
                     break;
                 case "move":
                     log.info("Move {} to {}", source, target);
