@@ -239,6 +239,9 @@ public class MainController {
 
     private List<String> commandByMimeType(String path, JSONObject stateJson){
         String mimeType = util.FileUtils.getTypeMime(path);
+        if(mimeType==null){
+            return null;
+        }
         JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
         for(int i = 0; i<mappings.length(); i++){
             JSONObject mapping = mappings.getJSONObject(i);
