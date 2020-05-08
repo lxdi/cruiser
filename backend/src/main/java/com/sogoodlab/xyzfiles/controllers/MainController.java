@@ -142,11 +142,7 @@ public class MainController {
                     break;
                 case "move":
                     log.info("Move {} to {}", source, target);
-                    if(sourceFile.isDirectory()){
-                        FileUtils.moveDirectory(sourceFile, new File(target+sourceFile.getName()));
-                    } else {
-                        Files.move(sourceFile.toPath(), Paths.get(target+sourceFile.getName()), StandardCopyOption.REPLACE_EXISTING);
-                    }
+                    move(sourceFile, target+sourceFile.getName());
                     break;
             }
         } catch (IOException e){
@@ -160,7 +156,15 @@ public class MainController {
             throw new FileNotFoundException("File " + fileToRemove.getName() + " doesn't exist");
         }
         log.info("Move to trash dir {}", path);
-        Files.move(Paths.get(path), Paths.get(getTrashPath()+fileToRemove.getName()), StandardCopyOption.REPLACE_EXISTING);
+        move(fileToRemove, getTrashPath()+fileToRemove.getName());
+    }
+
+    private void move(File sourceFile, String pathDest) throws IOException {
+        if(sourceFile.isDirectory()){
+            FileUtils.moveDirectory(sourceFile, new File(pathDest));
+        } else {
+            Files.move(sourceFile.toPath(), Paths.get(pathDest), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     private JSONObject getStateJson() {
