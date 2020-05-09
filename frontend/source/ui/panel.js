@@ -29,12 +29,12 @@ export class Panel extends React.Component {
     if(chkSt('gstate', 'stateObj')!=null){
       const cwd = chkSt('gstate', 'stateObj').panels[this.props.name].cwd
       return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')}>
-            <div onClick={()=>fireEvent('panels', 'switch-current')}>
-              <span>{getPath(cwd)}</span>
-              <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
+                <div onClick={()=>fireEvent('panels', 'switch-current')}>
+                  <span>{getPath(cwd)}</span>
+                  <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
+                </div>
+                <div>{getFilesUI(this)}</div>
             </div>
-            <div>{getFilesUI(this)}</div>
-          </div>
     } else {
       return 'Loading...'
     }

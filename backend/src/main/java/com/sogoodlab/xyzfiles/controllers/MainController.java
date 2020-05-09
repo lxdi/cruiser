@@ -65,15 +65,16 @@ public class MainController {
 
     @PostMapping("/command/trash/move")
     public @ResponseBody String delete(@RequestBody FileDto file) throws IOException {
-        moveToTrash(file.getPath());
+        moveToTrash(file.getPath(), UUID.randomUUID().toString());
         return "Ok";
     }
 
     @PostMapping("/command/trash/move/multiple")
     public @ResponseBody String multiDelete(@RequestBody List<FileDto> files){
+        String trashUniqueFolder = UUID.randomUUID().toString();
         for(FileDto file : files){
             try{
-                moveToTrash(file.getPath());
+                moveToTrash(file.getPath(), trashUniqueFolder);
             } catch (IOException e){
                 log.error(e.getMessage(), e);
             }
@@ -150,13 +151,18 @@ public class MainController {
         }
     }
 
-    private void moveToTrash(String path) throws IOException {
+    private void moveToTrash(String path, String trashFolderName) throws IOException {
         File fileToRemove = new File(path);
         if(!fileToRemove.exists()){
             throw new FileNotFoundException("File " + fileToRemove.getName() + " doesn't exist");
         }
+        String folderInTrashBin = getTrashPath()+trashFolderName;
+        File folderInTrashBinFile = new File(folderInTrashBin);
+        if(!folderInTrashBinFile.exists() && !folderInTrashBinFile.mkdir()){
+            throw new RuntimeException("Couldn't create folder in trash bin: "+ folderInTrashBin);
+        }
         log.info("Move to trash dir {}", path);
-        move(fileToRemove, getTrashPath()+fileToRemove.getName());
+        move(fileToRemove,  folderInTrashBin + File.separator + fileToRemove.getName());
     }
 
     private void move(File sourceFile, String pathDest) throws IOException {

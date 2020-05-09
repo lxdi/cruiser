@@ -8,7 +8,7 @@ for line in process.stdout:
 process.wait()
 
 warPath = os.path.join(os.getcwd(), 'backend', 'build', 'libs', 'ROOT.jar')
-processjava = subprocess.Popen('java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -jar %s' % warPath, shell=True)
+processjava = subprocess.Popen('java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006 -jar %s' % warPath, shell=True)
 print(processjava.pid)
 
 command = input('Command: ')

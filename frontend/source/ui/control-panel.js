@@ -4,6 +4,8 @@ import {Button} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {getOppositePanelNameShort, getCurrentPanel} from './panel'
 
+import {SpinnerWrapper} from './spinner'
+
 const buttonStyle = {marginTop:'3px', width: '100px'}
 
 export class ControlPanel extends React.Component {
@@ -54,6 +56,8 @@ const getBookmarksUI = function(comp){
           </div>
           {getDeviderUI()}
           {getPanelSpecificControlsUI()}
+          {getDeviderUI()}
+          <SpinnerWrapper/>
         </div>
 }
 
