@@ -13,8 +13,7 @@ public class FileUtils {
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
     public static String getPath(File file){
-        return (file.getParent().equals(File.separator)? File.separator: file.getParent())
-                + File.separator
+        return (file.getParent().equals(File.separator)? File.separator: file.getParent() + File.separator)
                 + file.getName()
                 + (file.isDirectory()? File.separator: "");
     }
