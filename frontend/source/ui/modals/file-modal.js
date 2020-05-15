@@ -89,6 +89,7 @@ const getFooterButtonsUI = function(comp, files){
   files.forEach(f => filesPaths.push(f.path))
   return [
     comp.state.rename!=null && comp.state.newName!=''? <Button id='rename' onClick={()=>fireEvent('commands', 'rename', [files[0].path, comp.state.newName])} variant="info">Rename</Button>:null,
+    files.length==1 && !isDir(files[0].path)? <Button id='download' onClick={()=>fireEvent('commands', 'download', [files[0]])} variant="primary">Download</Button>:null,
     <Button id='copy' onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])} variant="success">Copy</Button>,
     <Button id='move' onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])} variant="warning">Move</Button>,
     <Button id='delete' onClick={()=>fireEvent('commands', 'delete', [files])} variant="danger">Delete</Button>,

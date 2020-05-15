@@ -23,6 +23,19 @@ export const sendDelete = function(url, callback){
   }).then((data)=>callback(data.data));
 }
 
+export const sendDownload = function(url, sendData, callback){
+  axios({
+    contentType: 'application/json',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    responseType: 'blob',
+    method: 'POST',
+    url: url,
+    data: sendData,
+  }).then((data)=>callback(data.data));
+}
+
 const sendWithData = function(url, sendData, callback, type){
   axios({
     contentType: 'application/json',

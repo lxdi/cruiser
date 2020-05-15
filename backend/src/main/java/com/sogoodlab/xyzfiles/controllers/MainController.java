@@ -7,12 +7,18 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -124,6 +130,22 @@ public class MainController {
             log.error("Directory already exists {}", path);
         }
         return "Ok";
+    }
+
+    @PostMapping("/command/download")
+    public ResponseEntity<Resource> download(@RequestBody String pathStr) throws IOException {
+        File file = new File(pathStr);
+        if(!file.exists()){
+            throw new FileNotFoundException(file.getPath());
+        }
+        log.info("Downloading: {}", file.getPath());
+        Path path = file.toPath();
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+        return ResponseEntity.ok()
+                .headers(new HttpHeaders())
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     private void copyMove(String source, String target, String operationType){

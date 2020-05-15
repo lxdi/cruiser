@@ -1,6 +1,6 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-import {sendPost} from './postoffice'
-import {getPath} from './../services/pathUtils'
+import {sendPost, sendDownload} from './postoffice'
+import {getPath, getName} from './../services/pathUtils'
 
 registerEvent('commands', 'open', (stSetter, path)=>{
   sendPost('/command/open', path, ()=>{})
@@ -51,3 +51,16 @@ registerEvent('commands', 'create-new-dir', (stSetter, path)=>{
   return [getPath(path)]
 })
 registerEvent('commands', 'dir-created', ()=>{})
+
+registerEvent('commands', 'download', (stSetter, file)=>{
+  sendDownload('/command/download', file.path, (data)=>{
+    const url = window.URL.createObjectURL(new Blob([data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', getName(file.path))
+    document.body.appendChild(link)
+    link.click()
+    link.remove();
+    window.URL.revokeObjectURL(url)
+  })
+})
