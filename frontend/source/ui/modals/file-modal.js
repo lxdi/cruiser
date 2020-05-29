@@ -84,7 +84,7 @@ const getFilesIU = function(files){
 }
 
 const getFooterButtonsUI = function(comp, files){
-  const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(chkSt('file-modal', 'panelName'))].cwd
+  const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(chkSt('file-modal', 'panelName'))].tabs[0]
   const filesPaths = []
   files.forEach(f => filesPaths.push(f.path))
   return [

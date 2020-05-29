@@ -14,10 +14,12 @@
   ],
   "panels": {
     "left": {
-      "cwd": "/"
+      "tabs": ["/"],
+      "current": 0
     },
     "right": {
-      "cwd": "/"
+      "tabs": ["/"],
+      "current": 0
     }
   },
   "commands": {

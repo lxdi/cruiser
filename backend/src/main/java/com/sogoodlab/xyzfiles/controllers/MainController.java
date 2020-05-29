@@ -50,11 +50,11 @@ public class MainController {
         return getStateJson().toString();
     }
 
-    @PostMapping("/state/update/cwd/{name}")
-    public @ResponseBody String stateUpdate(@PathVariable("name") String name, @RequestBody String path) throws IOException {
+    @PostMapping("/state/update/cwd/{name}/{pos}")
+    public @ResponseBody String stateUpdate(@PathVariable("name") String name, @PathVariable int pos, @RequestBody String path) throws IOException {
         File stateFile = getStateFile();
         JSONObject stateJson = new JSONObject(FileUtils.readFileToString(stateFile, StandardCharsets.UTF_8));
-        stateJson.getJSONObject("panels").getJSONObject(name).put("cwd", path);
+        stateJson.getJSONObject("panels").getJSONObject(name).getJSONArray("tabs").put(pos, path);
         try(InputStream is = new ByteArrayInputStream(stateJson.toString().getBytes())){
             FileUtils.copyInputStreamToFile(is, stateFile);
         }

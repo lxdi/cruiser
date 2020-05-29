@@ -9,8 +9,8 @@ registerEvent('gstate', 'get', (stSetter)=>{
 
 registerEvent('gstate', 'got', (stSetter, state)=>stSetter('stateObj', state))
 
-registerEvent('gstate', 'update-cwd', (stSetter, name, newCwd)=> {
-  sendPost('/state/update/cwd/'+name, newCwd, ()=>{})
+registerEvent('gstate', 'update-cwd', (stSetter, name, newCwd, pos)=> {
+  sendPost('/state/update/cwd/'+name+'/'+pos, newCwd, ()=>{})
 })
 
 fireEvent('gstate', 'get')

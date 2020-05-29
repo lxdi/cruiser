@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Button, Form} from 'react-bootstrap'
+import {Button, Form, Tabs, Tab} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {getPath, getName, isDir} from '../services/pathUtils'
 import {getSeparator} from '../services/separator'
@@ -27,13 +27,17 @@ export class Panel extends React.Component {
 
   render(){
     if(chkSt('gstate', 'stateObj')!=null){
-      const cwd = chkSt('gstate', 'stateObj').panels[this.props.name].cwd
+      const cwd = chkSt('gstate', 'stateObj').panels[this.props.name].tabs[0]
       return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')}>
-                <div onClick={()=>fireEvent('panels', 'switch-current')}>
-                  <span>{getPath(cwd)}</span>
-                  <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
-                </div>
-                <div>{getFilesUI(this)}</div>
+                <Tabs defaultActiveKey="current path">
+                    <Tab eventKey="current path" title="Current path">
+                      {getTabContent(this, cwd)}
+                    </Tab>
+                    <Tab eventKey="path2" title="Path 2">
+                    </Tab>
+                    <Tab eventKey="path3" title="Path3">
+                    </Tab>
+                  </Tabs>
             </div>
     } else {
       return 'Loading...'
@@ -43,17 +47,17 @@ export class Panel extends React.Component {
 }
 
 const handleChangeDir = function(comp, stSetter, newCwd){
-  chkSt('gstate', 'stateObj').panels[comp.props.name].cwd = newCwd
+  chkSt('gstate', 'stateObj').panels[comp.props.name].tabs[0] = newCwd
   stSetter('selected', [])
   if(chkSt('files-rep', newCwd)==null){
     fireEvent('files-rep', 'get-files-by-path', [newCwd])
   }
-  fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd])
+  fireEvent('gstate', 'update-cwd', [comp.props.name, newCwd, 0])
   comp.setState({})
 }
 
 const handleBack = function(comp, stSetter){
-  const cwd = chkSt('gstate', 'stateObj').panels[comp.props.name].cwd
+  const cwd = chkSt('gstate', 'stateObj').panels[comp.props.name].tabs[0]
   var newCwd = getSeparator()
   if(cwd!=getSeparator() && cwd.lastIndexOf(getSeparator())>0){
     newCwd = getPath(cwd)
@@ -74,8 +78,18 @@ const handleSelect = function(comp, stSetter, file){
   comp.setState({})
 }
 
+const getTabContent = function(comp, cwd){
+  return <div>
+            <div onClick={()=>fireEvent('panels', 'switch-current')}>
+              <span>{getPath(cwd)}</span>
+              <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
+            </div>
+            <div>{getFilesUI(comp)}</div>
+          </div>
+}
+
 const getFilesUI = function(comp){
-  const files = chkSt('files-rep', chkSt('gstate', 'stateObj').panels[comp.props.name].cwd)
+  const files = chkSt('files-rep', chkSt('gstate', 'stateObj').panels[comp.props.name].tabs[0])
   if(files!=null){
     const dirsUI = []
     const filesUI = []//files.map(f => <div> <a href="#">{f.name} </a></div>)
@@ -97,7 +111,7 @@ const getFilesUI = function(comp){
               {filesUI}
           </table>
   } else {
-    fireEvent('files-rep', 'get-files-by-path', [chkSt('gstate', 'stateObj').panels[comp.props.name].cwd])
+    fireEvent('files-rep', 'get-files-by-path', [chkSt('gstate', 'stateObj').panels[comp.props.name].tabs[0]])
     return 'Loading...'
   }
 }
