@@ -55,6 +55,7 @@ public class MainController {
         File stateFile = getStateFile();
         JSONObject stateJson = new JSONObject(FileUtils.readFileToString(stateFile, StandardCharsets.UTF_8));
         stateJson.getJSONObject("panels").getJSONObject(name).getJSONArray("tabs").put(pos, path);
+        stateJson.getJSONObject("panels").getJSONObject(name).put("current", pos);
         try(InputStream is = new ByteArrayInputStream(stateJson.toString().getBytes())){
             FileUtils.copyInputStreamToFile(is, stateFile);
         }
