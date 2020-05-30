@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -52,14 +53,47 @@ public class MainController {
 
     @PostMapping("/state/update/cwd/{name}/{pos}")
     public @ResponseBody String stateUpdate(@PathVariable("name") String name, @PathVariable int pos, @RequestBody String path) throws IOException {
-        File stateFile = getStateFile();
-        JSONObject stateJson = new JSONObject(FileUtils.readFileToString(stateFile, StandardCharsets.UTF_8));
-        stateJson.getJSONObject("panels").getJSONObject(name).getJSONArray("tabs").put(pos, path);
-        stateJson.getJSONObject("panels").getJSONObject(name).put("current", pos);
-        try(InputStream is = new ByteArrayInputStream(stateJson.toString().getBytes())){
-            FileUtils.copyInputStreamToFile(is, stateFile);
-        }
-        return stateJson.toString();
+        return operationOnState(stateJson -> {
+            stateJson.getJSONObject("panels").getJSONObject(name).getJSONArray("tabs").put(pos, path);
+            stateJson.getJSONObject("panels").getJSONObject(name).put("current", pos);
+        }).toString();
+    }
+
+    @PostMapping("/state/update/tab/new/{panelName}")
+    public @ResponseBody String addTab(@PathVariable("panelName") String panelName) throws IOException {
+        operationOnState(stateJson -> {
+            JSONArray tabsArray = stateJson.getJSONObject("panels").getJSONObject(panelName).getJSONArray("tabs");
+            tabsArray.put(File.separator);
+            stateJson.getJSONObject("panels").getJSONObject(panelName).put("current", tabsArray.length()-1);
+            log.info("Creating new tab on panel {}", panelName);
+        });
+        return "Ok";
+    }
+
+    @PostMapping("/state/update/panel/{panelName}/tab/current/{pos}")
+    public @ResponseBody String changeCurrentTab(@PathVariable("panelName") String panelName, @PathVariable("pos") int pos) throws IOException {
+        operationOnState(stateJson -> {
+            stateJson.getJSONObject("panels").getJSONObject(panelName).put("current", pos);
+        });
+        return "OK";
+    }
+
+    @PostMapping("/state/update/panel/{panelName}/tab/remove/{pos}")
+    public @ResponseBody String removeTab(@PathVariable("panelName") String panelName, @PathVariable("pos") int pos) throws IOException {
+        operationOnState(stateJson -> {
+            JSONObject panel = stateJson.getJSONObject("panels").getJSONObject(panelName);
+            JSONArray tabs = panel.getJSONArray("tabs");
+            if(pos==0 && tabs.length()<2){
+                throw new RuntimeException("Can't remove single tab");
+            }
+            tabs.remove(pos);
+            if(panel.getInt("current")==pos){
+                int newPos = pos==0? pos+1: pos-1;
+                panel.put("current", newPos);
+            }
+            log.info("Removing tab from panel {} in position {}", panelName, pos);
+        });
+        return "OK";
     }
 
     @PostMapping("/command/open")
@@ -147,6 +181,16 @@ public class MainController {
                 .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    private JSONObject operationOnState(Consumer<JSONObject> operation) throws IOException {
+        File stateFile = getStateFile();
+        JSONObject stateJson = new JSONObject(FileUtils.readFileToString(stateFile, StandardCharsets.UTF_8));
+        operation.accept(stateJson);
+        try(InputStream is = new ByteArrayInputStream(stateJson.toString().getBytes())){
+            FileUtils.copyInputStreamToFile(is, stateFile);
+        }
+        return stateJson;
     }
 
     private void copyMove(String source, String target, String operationType){

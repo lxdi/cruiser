@@ -68,7 +68,8 @@ const getDeviderUI = function(){
 const getPanelSpecificControlsUI = function(){
   const selected = chkSt(getCurrentPanel(), 'selected')
   if(selected!=null && selected.length>0){
-    const oppositePanelCwd = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(getCurrentPanel())].tabs[0]
+    const oppositePanel = chkSt('gstate', 'stateObj').panels[getOppositePanelNameShort(getCurrentPanel())]
+    const oppositePanelCwd = oppositePanel.tabs[oppositePanel.current]
     const filesPaths = []
     selected.forEach(f => filesPaths.push(f.path))
     return <div>

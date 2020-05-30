@@ -5,7 +5,7 @@ import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 
 import {getPath, getName, isDir} from '../services/pathUtils'
 import {getSeparator} from '../services/separator'
 
-registerEvent('panels', 'switch-current', ()=>{})
+registerEvent('panels', 'switch-current', (stSetter, panelName)=>panelName)
 
 const panelNamePrefix = 'panel-'
 
@@ -19,7 +19,7 @@ export class Panel extends React.Component {
     registerEvent(this.state.panelName, 'change-dir', (stSetter, newCwd) => handleChangeDir(this, stSetter, newCwd))
     registerEvent(this.state.panelName, 'back', (stSetter)=>handleBack(this, stSetter))
     registerEvent(this.state.panelName, 'select', (stSetter, file)=>handleSelect(this, stSetter, file))
-    registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter)=>{stSetter('current', !chkSt(this.state.panelName, 'current')); this.setState({})})
+    registerReaction(this.state.panelName, 'panels', 'switch-current', (stSetter, panelName)=>makeCurrent(this, stSetter, panelName))
     registerReaction(this.state.panelName, 'gstate', 'got', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'files-rep', 'files-received', ()=>this.setState({}))
     registerReaction(this.state.panelName, 'commands', ['deleted', 'copied', 'moved', 'renamed', 'dir-created'], (stSetter)=>{stSetter('selected', []);this.setState({})})
@@ -30,13 +30,11 @@ export class Panel extends React.Component {
       const panel = chkSt('gstate', 'stateObj').panels[this.props.name]
       const tabPaths = panel.tabs
       const currentPath = tabPaths[panel.current]
-      const tabsUI = tabPaths.map((path, idx)=><Tab eventKey={idx} title={getName(path)}>{getTabContent(this, path)}</Tab>)
-      return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')}>
+      const tabsUI = tabPaths.map((path, idx)=><Tab eventKey={idx} title={getTabTitleContent(this, path, idx, panel.current==idx)}>{getTabContent(this, path)}</Tab>)
+      return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')} onClick={()=>fireEvent('panels', 'switch-current', [this.state.panelName])}>
                 <Tabs activeKey={panel.current} onSelect={(e)=>handleSelectTab(this, e, panel)}>
                     {tabsUI}
-                    <Tab eventKey="add" title="+ Add">
-                      Hello
-                    </Tab>
+                    <Tab eventKey="add" title="+"></Tab>
                   </Tabs>
             </div>
     } else {
@@ -44,6 +42,15 @@ export class Panel extends React.Component {
     }
   }
 
+}
+
+const makeCurrent = function(comp, stSetter, panelToCurrent){
+  if(comp.state.panelName == panelToCurrent){
+    stSetter('current', true)
+  } else {
+    stSetter('current', false)
+  }
+  comp.setState({})
 }
 
 const handleChangeDir = function(comp, stSetter, newCwd){
@@ -83,13 +90,24 @@ const handleSelect = function(comp, stSetter, file){
 const handleSelectTab = function(comp, e, panel){
   if(e!=='add'){
     panel.current = e
+    fireEvent('gstate', 'update-tab-pos', [comp.props.name, e])
     comp.setState({})
+  } else {
+    fireEvent('gstate', 'add-tab', [comp.props.name])
   }
+}
+
+const getTabTitleContent = function(comp, path, pos, isCurrent){
+  return <div>
+            <span>{getName(path)}</span>
+            <span> </span>
+            {isCurrent?<span><a href='#' onClick={()=>fireEvent('gstate', 'remove-tab', [comp.props.name, pos])}>X</a></span>:''}
+          </div>
 }
 
 const getTabContent = function(comp, cwd){
   return <div>
-            <div onClick={()=>fireEvent('panels', 'switch-current')}>
+            <div>
               <span>{getPath(cwd)}</span>
               <span style={{fontWeight: 'bold'}}>{getName(cwd)}</span>
             </div>

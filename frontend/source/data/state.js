@@ -14,3 +14,21 @@ registerEvent('gstate', 'update-cwd', (stSetter, name, newCwd, pos)=> {
 })
 
 fireEvent('gstate', 'get')
+
+registerEvent('gstate', 'add-tab', (stSetter, panelName)=>{
+  sendPost('/state/update/tab/new/'+panelName, null, ()=>{
+    stSetter('stateObj', null)
+    fireEvent('gstate', 'get')
+  })
+})
+
+registerEvent('gstate', 'update-tab-pos', (stSetter, panelName, pos)=>{
+  sendPost('/state/update/panel/'+panelName+'/tab/current/'+pos, null, ()=>{})
+})
+
+registerEvent('gstate', 'remove-tab', (stSetter, panelName, pos)=>{
+  sendPost('/state/update/panel/'+ panelName +'/tab/remove/' + pos, null, ()=>{
+    stSetter('stateObj', null)
+    fireEvent('gstate', 'get')
+  })
+})
