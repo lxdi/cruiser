@@ -16,6 +16,7 @@ export class CreateNewModal extends React.Component{
   }
 
   render(){
+
     return (
       <Modal show={this.state.isOpen} dialogClassName='file-modal-style'>
             <Modal.Header>
@@ -29,7 +30,7 @@ export class CreateNewModal extends React.Component{
                   onChange={(e)=>changeNameHandler(this, e)}/>
             </div>
             <Modal.Footer>
-              <Button id='copy' onClick={()=>fireEvent('commands', 'create-new-dir', [chkSt('gstate', 'stateObj').panels[getCurrentPanelShort()].cwd + this.state.newName])} variant="success">Ok</Button>
+              <Button id='copy' onClick={()=>okHandler(this)} variant="success">Ok</Button>
               <Button id='copy' onClick={()=>fireEvent('create-new-modal', 'close')} variant="danger">Cancel</Button>
             </Modal.Footer>
       </Modal>
@@ -43,4 +44,9 @@ const changeNameHandler = function(comp, e){
     return
   }
   comp.setState({newName: newName})
+}
+
+const okHandler = function(comp){
+  const panel = chkSt('gstate', 'stateObj').panels[getCurrentPanelShort()]
+  fireEvent('commands', 'create-new-dir', [panel.tabs[panel.current] + comp.state.newName])
 }
