@@ -40,11 +40,11 @@ registerEvent('commands', 'move', (stSetter, sourcePathsArr, targetPath)=>{
 })
 registerEvent('commands', 'moved', ()=>{fireEvent('spinner', 'hide')})
 
-registerEvent('commands', 'rename', (stSetter, path, newName)=>{
-  sendPost('/command/rename', {path: path, newName: newName}, ()=>fireEvent('commands', 'renamed'))
+registerEvent('commands', 'update', (stSetter, path, newName, content)=>{
+  sendPost('/command/update', {path: path, newName: newName, content: content}, ()=>fireEvent('commands', 'updated'))
   return [getPath(path)]
 })
-registerEvent('commands', 'renamed', ()=>{})
+registerEvent('commands', 'updated', ()=>{})
 
 registerEvent('commands', 'create-new-dir', (stSetter, path)=>{
   sendPut('/command/dir', path, ()=>fireEvent('commands', 'dir-created'))

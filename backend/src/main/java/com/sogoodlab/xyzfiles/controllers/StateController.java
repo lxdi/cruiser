@@ -1,6 +1,6 @@
 package com.sogoodlab.xyzfiles.controllers;
 
-import com.sogoodlab.xyzfiles.service.CommandsServices;
+import com.sogoodlab.xyzfiles.service.CommandsService;
 import com.sogoodlab.xyzfiles.service.StateService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +22,7 @@ public class StateController {
     private StateService stateService;
 
     @Autowired
-    private CommandsServices commandsServices;
+    private CommandsService commandsServices;
 
     @GetMapping
     public String state() throws IOException {

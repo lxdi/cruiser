@@ -13,7 +13,18 @@ registerEvent('files-rep', 'files-received', (stSetter, path, files)=>{
   stSetter(path, files)
 })
 
-registerReaction('files-rep', 'commands', ['delete', 'copy', 'move', 'rename', 'create-new-dir'], (stSetter, paths)=>{
+registerEvent('files-rep', 'get-file-content', (stateSetter, path)=>{
+  sendPost('/file/get/content', path, (content) => fireEvent('files-rep', 'file-content-received', [path, content]))
+})
+
+registerEvent('files-rep', 'file-content-received', (stSetter, path, content)=>{
+  if(content == null){
+    return
+  }
+  stSetter(path, content)
+})
+
+registerReaction('files-rep', 'commands', ['delete', 'copy', 'move', 'update', 'create-new-dir'], (stSetter, paths)=>{
   paths.forEach(path => stSetter(path, null))
   stSetter(getTrashBookmark().path, null)
 })

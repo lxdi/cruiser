@@ -1,9 +1,9 @@
 package com.sogoodlab.xyzfiles.controllers;
 
 import com.sogoodlab.xyzfiles.dto.FileDto;
-import com.sogoodlab.xyzfiles.dto.FileRename;
+import com.sogoodlab.xyzfiles.dto.FileUpdate;
 import com.sogoodlab.xyzfiles.dto.FilesMoving;
-import com.sogoodlab.xyzfiles.service.CommandsServices;
+import com.sogoodlab.xyzfiles.service.CommandsService;
 import com.sogoodlab.xyzfiles.service.StateService;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class CommandController {
     private StateService stateService;
 
     @Autowired
-    private CommandsServices commandsServices;
+    private CommandsService commandsServices;
 
     @PostMapping("/open")
     public void open(@RequestBody String path) throws IOException {
@@ -72,9 +72,9 @@ public class CommandController {
         pathsSource.forEach(path -> commandsServices.copyMove(path, targetPath, "move"));
     }
 
-    @PostMapping("/rename")
-    public void rename(@RequestBody FileRename requisites) throws IOException {
-        commandsServices.rename(requisites);
+    @PostMapping("/update")
+    public void update(@RequestBody FileUpdate requisites) throws IOException {
+        commandsServices.update(requisites);
     }
 
     @PutMapping("/dir")

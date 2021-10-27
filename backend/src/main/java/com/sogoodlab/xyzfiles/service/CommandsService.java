@@ -1,7 +1,8 @@
 package com.sogoodlab.xyzfiles.service;
 
-import com.sogoodlab.xyzfiles.dto.FileRename;
+import com.sogoodlab.xyzfiles.dto.FileUpdate;
 import com.sogoodlab.xyzfiles.util.JsonUtil;
+import com.sogoodlab.xyzfiles.util.TextExtensions;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -22,7 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class CommandsServices {
+public class CommandsService {
 
     private Logger log = LoggerFactory.getLogger(StateService.class);
 
@@ -107,9 +109,9 @@ public class CommandsServices {
         move(fileToRemove,  folderInTrashBin + File.separator + fileToRemove.getName());
     }
 
-    public void rename(FileRename fileRename){
-        File file = new File(fileRename.getPath());
-        String newName = fileRename.getNewName();
+    public void update(FileUpdate fileUpdate){
+        File file = new File(fileUpdate.getPath());
+        String newName = fileUpdate.getNewName();
         String newPath = file.getParent()+File.separator+newName;
         log.info("Rename {} to {}", file.getAbsoluteFile(), newPath);
 
@@ -117,6 +119,14 @@ public class CommandsServices {
             Files.move(file.toPath(), Paths.get(newPath));
         } catch (IOException e) {
             log.error("Error while renaming", e);
+        }
+
+        if(fileUpdate.getContent()!=null && fileUpdate.getContent().getContent()!=null && TextExtensions.isTextContent(newPath)){
+            try {
+                FileUtils.writeStringToFile(new File(newPath), fileUpdate.getContent().getContent(), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                log.error("Error while updating content for file {}", newPath, e);
+            }
         }
     }
 

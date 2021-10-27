@@ -13,7 +13,8 @@ export class FileModal extends React.Component{
     registerObject('file-modal', {isOpen: false})
     registerEvent('file-modal', 'open', (stSetter, files, panelName)=>doOpen(this, stSetter, files, panelName))
     registerEvent('file-modal', 'close', (stSetter)=>doClose(this, stSetter))
-    registerReaction('file-modal', 'commands', ['deleted', 'copied', 'moved', 'renamed'], (stSetter)=>doClose(this, stSetter))
+    registerReaction('file-modal', 'commands', ['deleted', 'copied', 'moved', 'updated'], (stSetter)=>doClose(this, stSetter))
+    registerReaction('file-modal', 'files-rep', ['file-content-received'], (stSetter)=>this.setState({}))
   }
 
   render(){
@@ -46,8 +47,9 @@ const doOpen = function(comp, stSetter, files, panelName){
 
 const doClose = function(comp, stSetter){
   stSetter('current', null)
+  stSetter('files', null)
   stSetter('isOpen', false)
-  comp.setState({})
+  comp.setState({changed: null, newName: null})
 }
 
 const getModalBody = function(comp, files){
@@ -62,11 +64,36 @@ const getModalBody = function(comp, files){
 }
 
 const getSingleFileIU = function(comp){
-  return <Form.Control
-      type="text"
-      value={comp.state.newName}
-      placeholder={"Enter placeholder"}
-      onChange={(e)=>changeNameHandler(comp, e)}/>
+  const file = chkSt('file-modal', 'files')[0]
+  return <div>
+          <div>
+              <Form.Control
+                  type="text"
+                  value={comp.state.newName}
+                  placeholder={"Enter placeholder"}
+                  onChange={(e)=>changeNameHandler(comp, e)}/>
+          </div>
+          <div>
+            {getContentUI(comp, file.path)}
+          </div>
+      </div>
+}
+
+const getContentUI = function(comp, path){
+  const content = chkSt('files-rep', path)
+
+  if(content == null){
+    fireEvent('files-rep', 'get-file-content', [path])
+    return null
+  }
+
+  if(content.content == null){
+    return null
+  }
+
+  return <Form.Control as="textarea" rows={5} value={content.content}
+                        onChange={(e)=>changeContentHandler(comp, content, e)} />
+
 }
 
 const changeNameHandler = function(comp, e){
@@ -74,7 +101,12 @@ const changeNameHandler = function(comp, e){
   if(newName.includes(getSeparator())){
     return
   }
-  comp.setState({rename: true, newName: newName})
+  comp.setState({changed: true, newName: newName})
+}
+
+const changeContentHandler = function(comp, content, e){
+  content.content = e.target.value
+  comp.setState({changed: true})
 }
 
 const getFilesIU = function(files){
@@ -88,8 +120,9 @@ const getFooterButtonsUI = function(comp, files){
   const oppositePanelCwd = oppositePanel.tabs[oppositePanel.current]
   const filesPaths = []
   files.forEach(f => filesPaths.push(f.path))
+
   return [
-    comp.state.rename!=null && comp.state.newName!=''? <Button id='rename' onClick={()=>fireEvent('commands', 'rename', [files[0].path, comp.state.newName])} variant="info">Rename</Button>:null,
+    comp.state.changed==true? <Button id='update' onClick={()=>fireEvent('commands', 'update', [files[0].path, comp.state.newName, chkSt('files-rep', files[0].path)])} variant="info">Save</Button>:null,
     files.length==1 && !isDir(files[0].path)? <Button id='download' onClick={()=>fireEvent('commands', 'download', [files[0]])} variant="primary">Download</Button>:null,
     <Button id='copy' onClick={()=>fireEvent('commands', 'copy', [filesPaths, oppositePanelCwd])} variant="success">Copy</Button>,
     <Button id='move' onClick={()=>fireEvent('commands', 'move', [filesPaths, oppositePanelCwd])} variant="warning">Move</Button>,
