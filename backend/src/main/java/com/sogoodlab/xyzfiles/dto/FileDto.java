@@ -1,4 +1,4 @@
-package com.sogoodlab.xyzfiles.data;
+package com.sogoodlab.xyzfiles.dto;
 
 import util.FileUtils;
 

@@ -1,11 +1,10 @@
 package com.sogoodlab.xyzfiles.controllers;
 
-import com.sogoodlab.xyzfiles.data.FileDto;
+import com.sogoodlab.xyzfiles.dto.FileDto;
 import com.sogoodlab.xyzfiles.dto.FileRename;
 import com.sogoodlab.xyzfiles.dto.FilesMoving;
 import com.sogoodlab.xyzfiles.service.CommandsServices;
 import com.sogoodlab.xyzfiles.service.StateService;
-import com.sogoodlab.xyzfiles.util.JsonUtil;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
