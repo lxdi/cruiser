@@ -1,0 +1,59 @@
+{
+  "system": "mac",
+  "bookmarks": [
+    {
+      "name": "Root",
+      "path": "/",
+      "type": "dir"
+    },
+    {
+      "name": "Trash",
+      "path": "/trash",
+      "type": "dir"
+    }
+  ],
+  "panels": {
+    "left": {
+      "tabs": ["/"],
+      "current": 0
+    },
+    "right": {
+      "tabs": ["/"],
+      "current": 0
+    }
+  },
+  "commands": {
+    "default": ["open"],
+    "type-mappings": [
+      {
+        "match": "equals",
+        "type": "application/x-shellscript",
+        "command": [],
+        "match-type": "mime"
+      },
+      {
+        "match": "equals",
+        "type": "application/x-executable",
+        "command": [],
+        "match-type": "mime"
+      },
+      {
+        "match": "start",
+        "type": "video",
+        "command": [
+          "vlc"
+        ],
+        "match-type": "mime"
+      },
+      {
+        "type": [
+          ".xmind"
+        ],
+        "command": [
+          "xmind"
+        ],
+        "match-type": "ext"
+      }
+    ]
+  }
+}

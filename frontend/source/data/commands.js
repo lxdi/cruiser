@@ -1,5 +1,5 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-import {sendPost, sendDownload} from './postoffice'
+import {sendPost, sendDownload, sendPut} from './postoffice'
 import {getPath, getName} from './../services/pathUtils'
 
 registerEvent('commands', 'open', (stSetter, path)=>{
@@ -47,7 +47,7 @@ registerEvent('commands', 'rename', (stSetter, path, newName)=>{
 registerEvent('commands', 'renamed', ()=>{})
 
 registerEvent('commands', 'create-new-dir', (stSetter, path)=>{
-  sendPost('/command/create/dir', path, ()=>fireEvent('commands', 'dir-created'))
+  sendPut('/command/dir', path, ()=>fireEvent('commands', 'dir-created'))
   return [getPath(path)]
 })
 registerEvent('commands', 'dir-created', ()=>{})

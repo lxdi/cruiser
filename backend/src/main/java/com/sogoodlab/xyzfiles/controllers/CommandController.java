@@ -1,0 +1,102 @@
+package com.sogoodlab.xyzfiles.controllers;
+
+import com.sogoodlab.xyzfiles.data.FileDto;
+import com.sogoodlab.xyzfiles.dto.FileRename;
+import com.sogoodlab.xyzfiles.dto.FilesMoving;
+import com.sogoodlab.xyzfiles.service.CommandsServices;
+import com.sogoodlab.xyzfiles.service.StateService;
+import com.sogoodlab.xyzfiles.util.JsonUtil;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping(path="/command")
+public class CommandController {
+
+    private Logger log = LoggerFactory.getLogger(CommandController.class);
+
+    @Autowired
+    private StateService stateService;
+
+    @Autowired
+    private CommandsServices commandsServices;
+
+    @PostMapping("/open")
+    public void open(@RequestBody String path) throws IOException {
+        commandsServices.open(path);
+    }
+
+    @PostMapping("/trash/move")
+    public void delete(@RequestBody FileDto file) throws IOException {
+        commandsServices.moveToTrash(file.getPath());
+    }
+
+    @PostMapping("/trash/move/multiple")
+    public void multiDelete(@RequestBody List<FileDto> files){
+        commandsServices.moveToTrash(files.stream()
+                .map(FileDto::getPath)
+                .collect(Collectors.toList()));
+    }
+
+    @PostMapping("/trash/clean")
+    public void cleanTrash() throws IOException {
+        FileUtils.cleanDirectory(new File(commandsServices.getTrashPath()));
+    }
+
+    @PostMapping("/copy")
+    public void copy(@RequestBody FilesMoving requisites) throws IOException {
+        List<String> pathsSource = requisites.getFrom();
+        String targetPath = requisites.getTo();
+        pathsSource.forEach(path -> commandsServices.copyMove(path, targetPath, "copy"));
+    }
+
+    @PostMapping("/move")
+    public void move(@RequestBody FilesMoving requisites) throws IOException {
+        List<String> pathsSource = requisites.getFrom();
+        String targetPath = requisites.getTo();
+        pathsSource.forEach(path -> commandsServices.copyMove(path, targetPath, "move"));
+    }
+
+    @PostMapping("/rename")
+    public void rename(@RequestBody FileRename requisites) throws IOException {
+        commandsServices.rename(requisites);
+    }
+
+    @PutMapping("/dir")
+    public void createDir(@RequestBody String path){
+        commandsServices.createDir(path);
+    }
+
+    @PostMapping("/download")
+    public ResponseEntity<Resource> download(@RequestBody String pathStr) throws IOException {
+        File file = new File(pathStr);
+        if(!file.exists()){
+            throw new FileNotFoundException(file.getPath());
+        }
+        log.info("Downloading: {}", file.getPath());
+        Path path = file.toPath();
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+        return ResponseEntity.ok()
+                .headers(new HttpHeaders())
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+}

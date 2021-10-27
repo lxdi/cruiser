@@ -16,11 +16,8 @@ export const sendPost = function(url, sendData, callback){
   sendWithData(url, sendData, callback, 'POST')
 }
 
-export const sendDelete = function(url, callback){
-  axios({
-    method: 'DELETE',
-    url: url,
-  }).then((data)=>callback(data.data));
+export const sendDelete = function(url, sendData, callback){
+  sendWithData(url, sendData, callback, 'DELETE')
 }
 
 export const sendDownload = function(url, sendData, callback){
