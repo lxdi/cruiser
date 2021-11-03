@@ -17,8 +17,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +54,20 @@ public class CommandsService {
             dir.mkdir();
         } else {
             log.error("Directory already exists {}", path);
+        }
+    }
+
+    public void createTxtFile(FileUpdate fileUpdate){
+        Path file = Paths.get(fileUpdate.getPath());
+
+        if(new File(fileUpdate.getPath()).exists()){
+            throw new RuntimeException("File "+ fileUpdate.getPath()+" already exists");
+        }
+
+        try {
+            Files.write(file, List.of(fileUpdate.getContent().getContent()), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            log.error("Error while creating txt file", e);
         }
     }
 

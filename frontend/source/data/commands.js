@@ -52,6 +52,11 @@ registerEvent('commands', 'create-new-dir', (stSetter, path)=>{
 })
 registerEvent('commands', 'dir-created', ()=>{})
 
+registerEvent('commands', 'create-new-file-txt', (stSetter, path, content)=>{
+  sendPut('/command/file', {path: path, content: {content: content}}, ()=>fireEvent('commands', 'dir-created'))
+  return [getPath(path)]
+})
+
 registerEvent('commands', 'download', (stSetter, file)=>{
   sendDownload('/command/download', file.path, (data)=>{
     const url = window.URL.createObjectURL(new Blob([data]))

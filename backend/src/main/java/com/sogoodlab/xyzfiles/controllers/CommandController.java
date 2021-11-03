@@ -5,6 +5,7 @@ import com.sogoodlab.xyzfiles.dto.FileUpdate;
 import com.sogoodlab.xyzfiles.dto.FilesMoving;
 import com.sogoodlab.xyzfiles.service.CommandsService;
 import com.sogoodlab.xyzfiles.service.StateService;
+import com.sogoodlab.xyzfiles.util.TextExtensions;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,14 @@ public class CommandController {
     @PutMapping("/dir")
     public void createDir(@RequestBody String path){
         commandsServices.createDir(path);
+    }
+
+    @PutMapping("/file")
+    public void createFile(@RequestBody FileUpdate fileUpdate){
+        if(!TextExtensions.isTextContent(fileUpdate.getPath())){
+            throw new RuntimeException("Not a txt file to create");
+        }
+        commandsServices.createTxtFile(fileUpdate);
     }
 
     @PostMapping("/download")

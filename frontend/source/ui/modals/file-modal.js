@@ -91,7 +91,7 @@ const getContentUI = function(comp, path){
     return null
   }
 
-  return <Form.Control as="textarea" rows={5} value={content.content}
+  return <Form.Control as="textarea" size='sm' rows={20} value={content.content}
                         onChange={(e)=>changeContentHandler(comp, content, e)} />
 
 }

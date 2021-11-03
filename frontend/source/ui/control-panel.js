@@ -51,7 +51,8 @@ const getBookmarksUI = function(comp){
           {fileBookmarks}
           {getDeviderUI()}
           <div>
-            <div style={buttonStyle}><Button variant='info' size='sm' block onClick={()=>fireEvent('create-new-modal', 'open')}>Create Dir</Button></div>
+            <div style={buttonStyle}><Button variant='info' size='sm' block onClick={()=>fireEvent('create-new-modal', 'open', [true])}>Create Dir</Button></div>
+            <div style={buttonStyle}><Button variant='primary' size='sm' block onClick={()=>fireEvent('create-new-modal', 'open', [false])}>Create File</Button></div>
             <div style={buttonStyle}><Button variant='warning' size='sm' block onClick={()=>fireEvent('commands', 'clean-trash')}>Clean trash</Button></div>
           </div>
           {getDeviderUI()}
