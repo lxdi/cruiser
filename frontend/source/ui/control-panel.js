@@ -63,7 +63,7 @@ const getBookmarksUI = function(comp){
 }
 
 const getDeviderUI = function(){
-  return <div style={{'borderBottom': '1px solid lightgrey', 'margin': '5px'}}> </div>
+  return <div class='divider'> </div>
 }
 
 const getPanelSpecificControlsUI = function(){

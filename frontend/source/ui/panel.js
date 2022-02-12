@@ -147,9 +147,9 @@ const getFileEntryTrUI = function(comp, file){
   const panelName = comp.state.panelName
   const selected = chkSt(comp.state.panelName, 'selected')
   const isSelected = selected.includes(file)
-  const style = isSelected? {'background-color': 'lightBlue'}: {}
+  const cls = 'file-div ' + (isSelected? 'file-selected': '')
   const toModal = selected.length>0? selected: [file]
-  return <tr id={getName(file.path)+isSelected} style={style} class='file-div' onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
+  return <tr id={getName(file.path)+isSelected} class={cls} onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
             <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
             <td width='10%' class={getStyleForSize(file)}>{formatBytes(file.size)}</td>

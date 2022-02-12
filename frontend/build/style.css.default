@@ -1,5 +1,5 @@
 .file-div {
-  border-bottom: 1px solid steelblue;
+  border-bottom: 1px solid lightgrey;
 }
 
 .file-td {
@@ -7,18 +7,13 @@
 }
 
 .file-div:hover {
-  border-bottom: 1px solid green;
-  background-color: darkslategrey;
-}
-
-.file-selected {
-  background-color: royalblue;
+  border: 1px solid green;
+  background-color: ivory;
 }
 
 .bullet:hover {
-  border: 1px solid steelblue;
-  border-radius: 5px;
-  background-color: steelblue;
+  border: 1px solid cyan;
+  border-radius: 5px
 }
 
 .main-table {
@@ -45,24 +40,19 @@
 }
 
 .panel-current {
-  border: 2px solid deepskyblue
+  border: 2px solid blue
 }
 
 .panel-non-current {
-  border: 1px solid darkgrey
+  border: 1px solid lightblue
 }
 
 .control-panel-main {
   margin: 3px;
-  /* border: 1px solid green; */
+  border: 1px solid green;
   border-radius: 10px;
   overflow: auto;
   height:97vh;
-}
-
-.divider {
-  border-bottom: 1px solid steelblue;
-  margin: 5px;
 }
 
 .file-modal-style {
@@ -75,15 +65,15 @@
 }
 
 .file-name-dir {
-  color: tan
+  color: orange
 }
 
 .file-name-default {
-  color: lightcyan
+  color: grey
 }
 
 .file-name-video {
-  color: lightskyblue
+  color: blue
 }
 
 .file-name-image {
@@ -91,15 +81,15 @@
 }
 
 .file-name-pdf {
-  color: lightcoral
+  color: red
 }
 
 .file-size-bt {
-  color: deepskyblue
+  color: blue
 }
 
 .file-size-kb {
-  color: lightseagreen
+  color: green
 }
 
 .file-size-mb {
