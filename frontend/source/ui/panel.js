@@ -151,7 +151,7 @@ const getFileEntryTrUI = function(comp, file){
   const toModal = selected.length>0? selected: [file]
   return <tr id={getName(file.path)+isSelected} class={cls} onClick={(event)=>hanldeFileEntryClick(comp, file, event)}>
             <td><div class='bullet' style={{'width': '15px', 'text-align':'center'}} onClick={(e)=>{fireEvent(panelName, 'select', [file]); e.preventDefault()}}>&bull;</div></td>
-            <td width='75%' style={{'paddingLeft':'3px'}}> {getFileNameUI(file)} </td>
+            <td width='75%' style={{'paddingLeft':'3px'}}><div class='noselect-text'>{getFileNameUI(file)}</div></td>
             <td width='10%' class={getStyleForSize(file)}>{formatBytes(file.size)}</td>
             <td width='10%'>{formatDate(new Date(file.lastModified))}</td>
             <td width='5%'><a href='#' onClick={(event)=>{fireEvent('file-modal', 'open', [toModal, comp.state.panelName]); event.preventDefault()}}>More</a></td>
