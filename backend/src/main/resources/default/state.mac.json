@@ -27,19 +27,19 @@
     "type-mappings": [
       {
         "match": "equals",
-        "type": "application/x-shellscript",
+        "type": ["application/x-shellscript"],
         "command": [],
         "match-type": "mime"
       },
       {
         "match": "equals",
-        "type": "application/x-executable",
+        "type": ["application/x-executable"],
         "command": [],
         "match-type": "mime"
       },
       {
         "match": "start",
-        "type": "video",
+        "type": ["video"],
         "command": [
           "vlc"
         ],

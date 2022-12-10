@@ -1,5 +1,7 @@
 package com.sogoodlab.xyzfiles.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sogoodlab.xyzfiles.dto.state.PanelDto;
 import com.sogoodlab.xyzfiles.service.CommandsService;
 import com.sogoodlab.xyzfiles.service.StateService;
 import org.json.JSONArray;
@@ -24,51 +26,58 @@ public class StateController {
     @Autowired
     private CommandsService commandsServices;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @GetMapping
     public String state() throws IOException {
-        return stateService.getState().toString();
+        return mapper.writeValueAsString(stateService.getState());
     }
 
     @PostMapping("/cwd/{name}/{pos}")// /state/update/cwd/{name}/{pos}
-    public @ResponseBody String stateUpdate(@PathVariable("name") String name, @PathVariable int pos, @RequestBody String path) throws IOException {
-        return stateService.operationOnState(stateJson -> {
-            stateJson.getJSONObject("panels").getJSONObject(name).getJSONArray("tabs").put(pos, path);
-            stateJson.getJSONObject("panels").getJSONObject(name).put("current", pos);
-        }).toString();
+    public @ResponseBody String stateUpdate(@PathVariable("name") PanelDto.PanelDirection name, @PathVariable int pos, @RequestBody String path) throws IOException {
+        return mapper.writeValueAsString(
+                stateService.operationOnState(state -> {
+            state.getPanels().get(name).getTabs().set(pos, path);
+            state.getPanels().get(name).setCurrent(pos);
+        }));
     }
 
     @PutMapping("/tab/{panelName}") // /state/update/tab/new/{panelName}
-    public @ResponseBody String addTab(@PathVariable("panelName") String panelName) throws IOException {
-        stateService.operationOnState(stateJson -> {
-            JSONArray tabsArray = stateJson.getJSONObject("panels").getJSONObject(panelName).getJSONArray("tabs");
-            tabsArray.put(File.separator);
-            stateJson.getJSONObject("panels").getJSONObject(panelName).put("current", tabsArray.length()-1);
+    public @ResponseBody String addTab(@PathVariable("panelName") PanelDto.PanelDirection panelName) throws IOException {
+        stateService.operationOnState(state -> {
+            var tabs = state.getPanels().get(panelName).getTabs();
+            tabs.add(File.separator);
+            state.getPanels().get(panelName).setCurrent(tabs.size()-1);
             log.info("Creating new tab on panel {}", panelName);
         });
         return "Ok";
     }
 
     @PostMapping("/panel/{panelName}/tab/current/{pos}") // /state/update/panel/{panelName}/tab/current/{pos}
-    public @ResponseBody String changeCurrentTab(@PathVariable("panelName") String panelName, @PathVariable("pos") int pos) throws IOException {
-        stateService.operationOnState(stateJson -> {
-            stateJson.getJSONObject("panels").getJSONObject(panelName).put("current", pos);
+    public @ResponseBody String changeCurrentTab(@PathVariable("panelName") PanelDto.PanelDirection panelName, @PathVariable("pos") int pos) throws IOException {
+        stateService.operationOnState(state -> {
+            state.getPanels().get(panelName).setCurrent(pos);
         });
         return "OK";
     }
 
     @DeleteMapping("/panel/{panelName}/tab/{pos}") // /state/update/panel/{panelName}/tab/remove/{pos}
-    public @ResponseBody String removeTab(@PathVariable("panelName") String panelName, @PathVariable("pos") int pos) throws IOException {
-        stateService.operationOnState(stateJson -> {
-            JSONObject panel = stateJson.getJSONObject("panels").getJSONObject(panelName);
-            JSONArray tabs = panel.getJSONArray("tabs");
-            if(pos==0 && tabs.length()<2){
+    public @ResponseBody String removeTab(@PathVariable("panelName") PanelDto.PanelDirection panelName, @PathVariable("pos") int pos) throws IOException {
+        stateService.operationOnState(state -> {
+            var tabs = state.getPanels().get(panelName).getTabs();
+
+            if(pos==0 && tabs.size()<2){
                 throw new RuntimeException("Can't remove single tab");
             }
+
             tabs.remove(pos);
-            if(panel.getInt("current")==pos){
+
+            if(state.getPanels().get(panelName).getCurrent() == pos){
                 int newPos = pos==0? pos+1: pos-1;
-                panel.put("current", newPos);
+                state.getPanels().get(panelName).setCurrent(newPos);
             }
+
             log.info("Removing tab from panel {} in position {}", panelName, pos);
         });
         return "OK";

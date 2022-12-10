@@ -1,9 +1,12 @@
 package com.sogoodlab.xyzfiles.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sogoodlab.xyzfiles.dto.state.StateDto;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,23 +29,27 @@ public class StateService {
     @Value("${state.json.path}")
     private String stateJsonPath;
 
-    public JSONObject getState() {
+    @Autowired
+    private ObjectMapper mapper;
+
+    public StateDto getState() {
         try {
-            return new JSONObject(FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8));
+            String stateRaw = FileUtils.readFileToString(getStateFile(), StandardCharsets.UTF_8);
+            return mapper.readValue(stateRaw, StateDto.class);
         }catch (IOException e){
             throw new RuntimeException("Error while reading state json file: ", e);
         }
     }
 
-    public JSONObject operationOnState(Consumer<JSONObject> operation) throws IOException {
-        File stateFile = getStateFile();
-        JSONObject stateJson = new JSONObject(FileUtils.readFileToString(stateFile, StandardCharsets.UTF_8));
-        operation.accept(stateJson);
+    public StateDto operationOnState(Consumer<StateDto> operation) throws IOException {
 
-        try(InputStream is = new ByteArrayInputStream(stateJson.toString().getBytes())){
-            FileUtils.copyInputStreamToFile(is, stateFile);
+        StateDto state = getState();
+        operation.accept(state);
+
+        try(InputStream is = new ByteArrayInputStream(mapper.writeValueAsString(state).getBytes())){
+            FileUtils.copyInputStreamToFile(is, getStateFile());
         }
-        return stateJson;
+        return state;
     }
 
     private File getStateFile() {

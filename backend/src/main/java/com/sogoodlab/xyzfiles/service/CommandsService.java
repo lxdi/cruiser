@@ -1,6 +1,9 @@
 package com.sogoodlab.xyzfiles.service;
 
 import com.sogoodlab.xyzfiles.dto.FileUpdate;
+import com.sogoodlab.xyzfiles.dto.state.BookmarkDto;
+import com.sogoodlab.xyzfiles.dto.state.Commands;
+import com.sogoodlab.xyzfiles.dto.state.StateDto;
 import com.sogoodlab.xyzfiles.util.JsonUtil;
 import com.sogoodlab.xyzfiles.util.TextExtensions;
 import org.apache.commons.io.FileUtils;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -155,69 +159,70 @@ public class CommandsService {
     }
 
     public String getTrashPath(){
-        JSONObject stateJson = stateService.getState();
-        JSONArray bookmarks = stateJson.getJSONArray("bookmarks");
-        for(int i=0; i<bookmarks.length(); i++){
-            if(bookmarks.getJSONObject(i).getString("name").equals(trashBookmark)){
-                return bookmarks.getJSONObject(i).getString("path");
+        StateDto state = stateService.getState();
+        List<BookmarkDto> bookmarks = state.getBookmarks();
+
+        for(BookmarkDto bm : bookmarks) {
+            if(bm.getName().equals(trashBookmark)){
+                return bm.getPath();
             }
         }
+
         throw new RuntimeException("Didn't find Trash bookmark");
     }
 
     public List<String> getCommand(String path){
-        JSONObject stateJson = stateService.getState();
-        List<String> result = commandByExt(path, stateJson);
+        StateDto state = stateService.getState();
+        List<String> result = commandByExt(path, state);
+
         if(result == null) {
-            result = Optional.ofNullable(commandByMimeType(path, stateJson)).orElse(getDefaultCommand(stateJson));
+            result = Optional.ofNullable(commandByMimeType(path, state)).orElse(state.getCommands().getDefaultCmd());
         }
+
         result.add(path);
         return result;
     }
 
-    private List<String> getDefaultCommand(JSONObject stateJson){
-        return JsonUtil.toList(stateJson.getJSONObject("commands").getJSONArray("default"));
-    }
-
-    private List<String> commandByExt(String path, JSONObject stateJson){
+    private List<String> commandByExt(String path, StateDto state){
         String extension = util.FileUtils.getExtension(path);
+
         if(extension==null){
             return null;
         }
-        JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
-        for(int i = 0; i<mappings.length(); i++){
-            JSONObject mapping = mappings.getJSONObject(i);
-            if(mapping.getString("match-type").equalsIgnoreCase("ext")
-                    && JsonUtil.toList(mapping.getJSONArray("type")).contains(extension)){
-                return JsonUtil.toList(mapping.getJSONArray("command"));
+
+        var mappings = state.getCommands().getTypeMappings();
+
+        for(Commands.TypeMapping tm : mappings) {
+            if(tm.getMatchType().equalsIgnoreCase("ext") && tm.getType().contains(extension)){
+                return tm.getCommand();
             }
         }
+
         return null;
     }
 
-    private List<String> commandByMimeType(String path, JSONObject stateJson){
+    private List<String> commandByMimeType(String path, StateDto state){
         String mimeType = util.FileUtils.getTypeMime(path);
+
         if(mimeType==null){
             return null;
         }
-        JSONArray mappings = stateJson.getJSONObject("commands").getJSONArray("type-mappings");
-        for(int i = 0; i<mappings.length(); i++){
-            JSONObject mapping = mappings.getJSONObject(i);
 
-            if(!mapping.getString("match-type").equalsIgnoreCase("mime")) {
+        for(Commands.TypeMapping tm : state.getCommands().getTypeMappings()) {
+
+            if(!tm.getMatchType().equalsIgnoreCase("mime")) {
                 continue;
             }
 
-            if (mapping.get("match").equals("start")) {
-                if (mimeType.startsWith((String) mapping.get("type"))) {
-                    return JsonUtil.toList(mapping.getJSONArray("command"));
-                }
-            } else {
-                if (mimeType.equalsIgnoreCase((String) mapping.get("type"))) {
-                    return JsonUtil.toList(mapping.getJSONArray("command"));
-                }
+            if (tm.getMatch().equals("start") && tm.getType().stream().anyMatch(mimeType::startsWith)) {
+                    return tm.getCommand();
+            }
+
+            if (tm.getMatch().equals("equals") && tm.getType().stream().anyMatch(mimeType::equalsIgnoreCase)) {
+                    return tm.getCommand();
             }
         }
+
         return null;
     }
 }
