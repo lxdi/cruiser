@@ -6,10 +6,12 @@ import java.io.File;
 
 public class FileDto {
 
-    String path;
-    long lastModified;
-    long size;
-    String mime;
+    private String path;
+    private long lastModified;
+    private long size;
+    private String mime;
+
+    public FileDto() {}
 
     public FileDto(String path, long lastModified, long size, String mime){
         this.path = path;
