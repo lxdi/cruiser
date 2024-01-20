@@ -35,7 +35,10 @@ public class StateController {
     }
 
     @PostMapping("/cwd/{name}/{pos}")// /state/update/cwd/{name}/{pos}
-    public @ResponseBody String stateUpdate(@PathVariable("name") PanelDto.PanelDirection name, @PathVariable int pos, @RequestBody String path) throws IOException {
+    public @ResponseBody String stateUpdate(@PathVariable("name") PanelDto.PanelDirection name, @PathVariable int pos, @RequestBody String pathRaw) throws IOException {
+
+        var path = pathRaw.replace("\"", "");
+
         return mapper.writeValueAsString(
                 stateService.operationOnState(state -> {
             state.getPanels().get(name).getTabs().set(pos, path);

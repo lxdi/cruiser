@@ -26,20 +26,23 @@ export class Panel extends React.Component {
   }
 
   render(){
-    if(chkSt('gstate', 'stateObj')!=null){
-      const panel = chkSt('gstate', 'stateObj').panels[this.props.name]
-      const tabPaths = panel.tabs
-      const currentPath = tabPaths[panel.current]
-      const tabsUI = tabPaths.map((path, idx)=><Tab eventKey={idx} title={getTabTitleContent(this, path, idx, panel.current==idx)}>{getTabContent(this, path)}</Tab>)
-      return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')} onClick={()=>fireEvent('panels', 'switch-current', [this.state.panelName])}>
-                <Tabs activeKey={panel.current} onSelect={(e)=>handleSelectTab(this, e, panel)}>
-                    {tabsUI}
-                    <Tab eventKey="add" title="+"></Tab>
-                  </Tabs>
-            </div>
-    } else {
+
+    if(chkSt('gstate', 'stateObj') == null){
       return 'Loading...'
     }
+    
+    const panel = chkSt('gstate', 'stateObj').panels[this.props.name]
+    const tabPaths = panel.tabs
+    const currentPath = tabPaths[panel.current]
+    const tabsUI = tabPaths.map((path, idx)=><Tab eventKey={idx} title={getTabTitleContent(this, path, idx, panel.current==idx)}>{getTabContent(this, path)}</Tab>)
+
+    return <div class={'panel-main ' + (chkSt(this.state.panelName, 'current')==true?'panel-current':'panel-non-current')} onClick={()=>fireEvent('panels', 'switch-current', [this.state.panelName])}>
+              <Tabs activeKey={panel.current} onSelect={(e)=>handleSelectTab(this, e, panel)}>
+                  {tabsUI}
+                  <Tab eventKey="add" title="+"></Tab>
+                </Tabs>
+          </div>
+
   }
 
 }

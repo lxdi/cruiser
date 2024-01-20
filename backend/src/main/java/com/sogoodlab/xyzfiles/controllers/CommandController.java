@@ -39,7 +39,7 @@ public class CommandController {
 
     @PostMapping("/open")
     public void open(@RequestBody String path) throws IOException {
-        commandsServices.open(path);
+        commandsServices.open(path.replace("\"", ""));
     }
 
     @PostMapping("/trash/move")
@@ -80,7 +80,7 @@ public class CommandController {
 
     @PutMapping("/dir")
     public void createDir(@RequestBody String path){
-        commandsServices.createDir(path);
+        commandsServices.createDir(path.replace("\"", ""));
     }
 
     @PutMapping("/file")
@@ -93,13 +93,17 @@ public class CommandController {
 
     @PostMapping("/download")
     public ResponseEntity<Resource> download(@RequestBody String pathStr) throws IOException {
-        File file = new File(pathStr);
+
+        File file = new File(pathStr.replace("\"", ""));
+
         if(!file.exists()){
             throw new FileNotFoundException(file.getPath());
         }
+
         log.info("Downloading: {}", file.getPath());
         Path path = file.toPath();
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
         return ResponseEntity.ok()
                 .headers(new HttpHeaders())
                 .contentLength(file.length())

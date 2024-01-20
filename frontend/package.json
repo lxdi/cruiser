@@ -4,25 +4,25 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "webpack -p",
+    "start": "webpack",
     "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-bootstrap": "^1.0.0",
-    "axios": "0.19.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-bootstrap": "^1.6.7",
+    "axios": "1.6.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "@babel/preset-react": "^7.9.4",
-    "babel-loader": "^8.1.0",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "jest": "23.6.0",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.8",
+    "@babel/preset-react": "^7.23.3",
+    "babel-loader": "^8.2.5",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "jest": "29.7.0",
     "babel-core": "7.0.0-bridge.0"
   }
 }

@@ -16,6 +16,7 @@ public class MainController {
 
     @PostMapping("/file/get/all")
     public List<FileDto> files(@RequestBody String path){
+        path = path.replace("\"", "");
         final File folder = new File(path);
         return Arrays.stream(Optional.ofNullable(folder.listFiles()).orElse(new File[0]))
                 .map(FileDto::of).collect(Collectors.toList());
@@ -23,6 +24,7 @@ public class MainController {
 
     @PostMapping("/file/get/content")
     public FileContent content(@RequestBody String path) throws IOException {
+        path = path.replace("\"", "");
         final File file = new File(path);
 
         if(!TextExtensions.isTextContent(file.getName()) || file.isDirectory()){
