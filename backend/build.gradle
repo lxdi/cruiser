@@ -17,22 +17,21 @@ dependencies {
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	implementation  'org.json:json:20190722'
 	implementation 'commons-io:commons-io:2.6'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
 	useJUnitPlatform()
 }
 
-task copyFront(type: Copy) {
-	from '../frontend/build'
-	into 'src/main/resources/static'
+tasks.register('copyFront', Copy) {
+    from '../frontend/build'
+    into 'src/main/resources/static'
 }
 
-task fullClean(type: Delete){
-	delete 'src/main/resources/static'
+tasks.register('fullClean', Delete) {
+    delete 'src/main/resources/static'
 }
 
 processResources.dependsOn copyFront
@@ -40,5 +39,9 @@ clean.dependsOn fullClean
 
 bootJar {
 	archiveFileName = 'ROOT.jar'
+}
+
+copyFront {
+    dependsOn ':frontend:compile'
 }
 

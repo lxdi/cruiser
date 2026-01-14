@@ -1,1 +1,10 @@
-tasks.getByPath(':backend:copyFront').dependsOn(':frontend:compile')
+//tasks.getByPath(':backend:copyFront').dependsOn(':frontend:compile')
+
+//def copyFrontTask = tasks.named(":backend:copyFront")
+//def frontendCompileTask = tasks.named(":frontend:compile")
+
+//tasks {
+//    register ':backend:copyFront' {
+//        dependsOn ':frontend:compile'
+//    }
+//}
