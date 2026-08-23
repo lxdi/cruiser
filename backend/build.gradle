@@ -30,11 +30,17 @@ tasks.register('copyFront', Copy) {
     into 'src/main/resources/static'
 }
 
+tasks.register('copyFrontMindMap', Copy) {
+	from '../frontend-mindmap/build'
+	into 'src/main/resources/static/mindmap'
+}
+
 tasks.register('fullClean', Delete) {
     delete 'src/main/resources/static'
 }
 
 processResources.dependsOn copyFront
+processResources.dependsOn copyFrontMindMap
 clean.dependsOn fullClean
 
 bootJar {
@@ -43,5 +49,9 @@ bootJar {
 
 copyFront {
     dependsOn ':frontend:compile'
+}
+
+copyFrontMindMap {
+	dependsOn ':frontend-mindmap:compile'
 }
 

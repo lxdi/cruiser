@@ -3,6 +3,12 @@ import {sendPost, sendDownload, sendPut} from './postoffice'
 import {getPath, getName} from './../services/pathUtils'
 
 registerEvent('commands', 'open', (stSetter, path)=>{
+
+  if (path.endsWith('.mm.json')) {
+    window.open('/mindmap/index.html?path=' + path, '_blank');
+    return
+  }
+
   sendPost('/command/open', path, ()=>{})
 })
 

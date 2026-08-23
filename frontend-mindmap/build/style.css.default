@@ -1,0 +1,105 @@
+.file-div {
+  border-bottom: 1px solid lightgrey;
+}
+
+.file-td {
+  padding: 0px;
+}
+
+.file-div:hover {
+  border: 1px solid green;
+  background-color: ivory;
+}
+
+.bullet:hover {
+  border: 1px solid cyan;
+  border-radius: 5px
+}
+
+.main-table {
+  width: 100%;
+}
+
+.panel-td {
+  width:45%;
+  vertical-align: top;
+}
+
+.conpanel-td {
+  width:10%;
+  vertical-align: top;
+}
+
+.panel-main {
+  padding: 3px;
+  /* border: 1px solid lightblue; */
+  border-radius: 10px;
+  overflow: auto;
+  height:97vh;
+  font-size: 9pt;
+}
+
+.panel-current {
+  border: 2px solid blue
+}
+
+.panel-non-current {
+  border: 1px solid lightblue
+}
+
+.control-panel-main {
+  margin: 3px;
+  border: 1px solid green;
+  border-radius: 10px;
+  overflow: auto;
+  height:97vh;
+}
+
+.file-modal-style {
+  max-width: 100%;
+  width:50%;
+}
+
+.file-link a:link {
+  color: inherit;
+}
+
+.file-name-dir {
+  color: orange
+}
+
+.file-name-default {
+  color: grey
+}
+
+.file-name-video {
+  color: blue
+}
+
+.file-name-image {
+  color: violet
+}
+
+.file-name-pdf {
+  color: red
+}
+
+.file-size-bt {
+  color: blue
+}
+
+.file-size-kb {
+  color: green
+}
+
+.file-size-mb {
+  color: orange
+}
+
+.file-size-gb {
+  color: red
+}
+
+.file-size-dt {
+  color: black
+}

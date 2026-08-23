@@ -1,0 +1,96 @@
+
+.nodes-main-frame {
+    display: grid;
+    place-items: center; /* Centers both ways at once */
+    height: 100vh;
+}
+
+a {
+  color: dimgray;
+  text-decoration: none; /* Removes the underline */
+  border: none;
+}
+
+a:focus {
+    outline: none;
+}
+
+.node-set-level1 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.node-common {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;
+  /* padding: 3px; */
+  color: black;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.node-common:hover {
+  border: 2px solid #d3dfeb;
+  /* background-color: rgba(227, 241, 245, 0.1); */
+  /* background-color: rgb(227 241 245 / 80%); */
+}
+
+.node-root {
+  border: 1px solid steelblue;
+  border-color: #687ba1;
+  min-width: 180px;
+  min-height: 50px;
+  font-size: 15pt;
+  font-weight: bold;
+  background-color: #caddfe;
+  border-radius: 8px;
+}
+
+.node-level1 {
+  border: 1px solid #b5aea6;
+  min-width: 30px;
+  min-height: 30px;
+  font-size: 12pt;
+  background-color: #fef4ec;
+  border-radius: 5px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.node-child-right {
+  border-left: 1px solid dimgrey;
+  border-bottom: 1px solid dimgrey;
+  font-size: 10pt;
+  padding-left: 5px;
+  border-radius: 3px;
+}
+
+.node-child-left {
+  border-right: 1px solid dimgrey;
+  border-bottom: 1px solid dimgrey;
+  font-size: 10pt;
+  padding-right: 5px;
+  border-radius: 3px;
+}
+
+.node-selected {
+  border: 2px solid #4b6fbd;
+}
+
+.node-modal-style {
+  max-width: 100%;
+  width:50%;
+}
+
+.node-phantom {
+  border: 1px solid grey;
+  border-radius: 5px;
+  width: 100px;
+  height: 30px;
+}
+
+.node-link {
+  height: 5px;
+  width: 5px;
+}

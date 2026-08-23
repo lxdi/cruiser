@@ -1,0 +1,22 @@
+
+def npm = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')?'npm.cmd':'npm'
+
+//task downloadDependencies(type: Exec){
+//    def nodeModulesFolder = new File('node_modules')
+//    if( !nodeModulesFolder.exists() ) {
+//        commandLine npm, "install"
+//    } else {
+//        //TODO for overcoming execCommand ==null error
+//        commandLine "echo", "dependencies already installed"
+//    }
+//}
+
+tasks.register('compile', Exec) {
+    commandLine npm, "start"
+}
+
+//compile.dependsOn downloadDependencies
+
+tasks.register('clean', Delete) {
+    delete 'build/bundle.js'
+}

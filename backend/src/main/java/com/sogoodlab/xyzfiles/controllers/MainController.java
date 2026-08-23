@@ -2,7 +2,9 @@ package com.sogoodlab.xyzfiles.controllers;
 
 import com.sogoodlab.xyzfiles.dto.FileContent;
 import com.sogoodlab.xyzfiles.dto.FileDto;
+import com.sogoodlab.xyzfiles.service.CommandsService;
 import com.sogoodlab.xyzfiles.util.TextExtensions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -13,6 +15,9 @@ import java.util.stream.Collectors;
 
 @RestController
 public class MainController {
+
+    @Autowired
+    private CommandsService commandsService;
 
     @PostMapping("/file/get/all")
     public List<FileDto> files(@RequestBody String path){
@@ -32,6 +37,11 @@ public class MainController {
         }
 
         return new FileContent(Files.readString(file.toPath(), StandardCharsets.UTF_8));
+    }
+
+    @PostMapping("/file/open")
+    public void openFile(@RequestParam("path") String path) {
+        commandsService.open(path);
     }
 
 }

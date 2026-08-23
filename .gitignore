@@ -25,6 +25,10 @@ frontend/build/bundle.js
 frontend/node_modules/
 frontend/package-lock.json
 
+frontend-mindmap/build/bundle.js
+frontend-mindmap/node_modules/
+frontend-mindmap/package-lock.json
+
 backend/src/main/resources/static/
 
 localconf/
