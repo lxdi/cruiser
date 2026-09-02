@@ -1,6 +1,6 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {sendGet, sendPost, sendPut, sendDelete} from './postoffice'
-import {getChildren, removeByValue, removeSystemProps, indexContent} from './common.js'
+import {getChildren, removeByValue, indexContent, indexNode, removeSystemPropsForContent} from './common.js'
 
 const defaultName = 'Subtopic '
 var counter = 1
@@ -19,11 +19,13 @@ registerEvent('state', 'get', (stSetter)=>{
     if(content.name != null) {
         document.title = content.name
     }
+
+    content = migrateToPanels(content)
     fireEvent('state', 'got', [content])
   })
 })
 
-registerEvent('state', 'got', (stSetter, content)=>stSetter('content', content))
+registerEvent('state', 'got', (stSetter, content)=>{ stSetter('content', content); stSetter('current-root', content.panels[0])})
 registerEvent('state', 'change', (stSetter)=>stSetter('changed', true))
 
 registerEvent('state', 'save', (stSetter)=> {
@@ -55,17 +57,9 @@ registerEvent('state', 'create-new', (stateSetter) => {
         return
     }
 
-    var newNode = null
-
-    if (parentNode != chkSt('state', 'content')) {
-        newNode = createChildNode(parentNode)
-    } else {
-        newNode = createChildForRoot()
-    }
-
+    var newNode = createChildForParent(parentNode)
     newNode.version = parentNode.version
-
-    indexContent(newNode, parentNode, false)
+    indexNode(newNode, parentNode, false)
     selectNode(newNode)
     stateSetter('changed', true)
 })
@@ -74,7 +68,7 @@ registerEvent('state', 'delete', (stateSetter) => {
 
     const node = chkSt('state', 'selected').at(-1)
 
-    if (chkSt('state', 'content') == node) {
+    if (chkSt('state', 'current-root') == node) {
         return
     }
 
@@ -91,18 +85,19 @@ registerEvent('state', 'restore', (stateSetter) => {
     }
 
     const restored = history.pop()
-    indexContent(restored, null, true)
+    indexContent(restored, true)
     stateSetter('content', restored)
+    stateSetter('current-root', restored.panels[0])
     fireEvent('dragndrop', 'clear')
     stateSetter('changed', true)
 })
 
 export const doSafePoint = function() {
     const content = chkSt('state', 'content')
-    removeSystemProps(content)
+    removeSystemPropsForContent(content)
     const clone = JSON.parse(JSON.stringify(content)) // structuredClone(chkSt('state', 'content'))
     history.push(clone)
-    indexContent(content, null, false)
+    indexContent(content, false)
 }
 
 const selectNode = function(node) {
@@ -120,27 +115,23 @@ const selectNode = function(node) {
     }
 }
 
-const createChildNode = function(parentNode) {
+const createChildForParent = function(parent) {
     const newNode = createNewNode()
-
-    if (parentNode.children != null) {
-        parentNode.children.push(newNode)
-    } else {
-        parentNode.children = [newNode]
-    }
-
-    return newNode
-}
-
-const createChildForRoot = function() {
-    const newNode = createNewNode()
-    const root = chkSt('state', 'content')
     var children = null
 
-    if (root.left.length > root.right.length) {
-        children = root.right
+    if (parent.left != null || parent.right != null) {
+        if (parent.left.length > parent.right.length) {
+            children = parent.right
+        } else {
+            children = parent.left
+        }
     } else {
-        children = root.left
+
+        if (parent.children == null) {
+            parent.children = []
+        }
+
+        children = parent.children
     }
 
     children.push(newNode)
@@ -156,9 +147,9 @@ const createNewNode = function() {
 
 const preparedForSave = function(node) {
     const content = chkSt('state', 'content')
-    removeSystemProps(content)
+    removeSystemPropsForContent(content)
     const clone = JSON.parse(JSON.stringify(content)) // structuredClone(chkSt('state', 'content'))
-    indexContent(content, null, false)
+    indexContent(content, false)
     return clone
 }
 
@@ -185,6 +176,18 @@ function downloadObjectAsJson(exportObj, exportName) {
   
   // 6. Clean up the URL state to free up memory
   URL.revokeObjectURL(url);
+}
+
+const migrateToPanels = function(content) {
+    if (content.panels != null) {
+        return content
+    }
+
+    content.title = 'Untitlted'
+
+    return {
+        panels: [content]
+    }
 }
 
 

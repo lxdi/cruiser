@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form} from 'react-bootstrap'
-import {NodeTree} from './components/node-tree'
+import {Panels} from './components/panels.js'
 import {NodeModal} from './components/node-modal'
-import {ButtonsBlock} from './components/buttons-block'
 
 import {registerEvent, registerObject, fireEvent, chkSt} from 'absevents'
 import './service/onkeypress-handler'
@@ -26,9 +25,8 @@ document.addEventListener('copy', (event) => {
 function rerender(){
 	ReactDOM.render(
 		<div>
-			<ButtonsBlock/>
 			<div class="nodes-main-frame" onClick={(e)=> {e.preventDefault(); fireEvent('state', 'unselect')}}>
-				<NodeTree />
+				<Panels />
 				<NodeModal/>
 			</div>
 		</div>, app);

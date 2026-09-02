@@ -52,7 +52,11 @@ export const getChildrenForNode = function(node) {
     return node.children
 }
 
-export const indexContent = function(curNode, parentNode, isNewVersion) {
+export const indexContent = function(content, isNewVersion) {
+    content.panels.forEach(panel => indexNode(panel, null, isNewVersion))
+}
+
+export const indexNode = function(curNode, parentNode, isNewVersion) {
 
     if (isNewVersion) {
         if (curNode.version == null ) {
@@ -71,16 +75,20 @@ export const indexContent = function(curNode, parentNode, isNewVersion) {
     }
 
     if (curNode.left != null) {
-        curNode.left.forEach(child => indexContent(child, curNode, isNewVersion));
+        curNode.left.forEach(child => indexNode(child, curNode, isNewVersion));
     }
 
     if (curNode.right != null) {
-        curNode.right.forEach(child => indexContent(child, curNode, isNewVersion));
+        curNode.right.forEach(child => indexNode(child, curNode, isNewVersion));
     }
 
     if (curNode.children != null) {
-        curNode.children.forEach(child => indexContent(child, curNode, isNewVersion));
+        curNode.children.forEach(child => indexNode(child, curNode, isNewVersion));
     }
+}
+
+export const removeSystemPropsForContent = function(content) {
+    content.panels.forEach(panel => removeSystemProps(panel))
 }
 
 export const removeSystemProps = function(curNode) {

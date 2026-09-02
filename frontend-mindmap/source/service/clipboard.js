@@ -1,6 +1,6 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {sendGet, sendPost, sendPut, sendDelete} from './postoffice'
-import {getChildren, removeByValue, parentCheck, getChildrenForNode, removeSystemProps, indexContent} from './common.js'
+import {getChildren, removeByValue, parentCheck, getChildrenForNode} from './common.js'
 import {doSafePoint} from './state.js'
 
 const buffer = []

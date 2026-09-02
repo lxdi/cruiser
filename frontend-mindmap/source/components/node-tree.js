@@ -7,23 +7,18 @@ import {ChildNode} from './child-node'
 export class NodeTree extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = { root: chkSt('state', 'content') }
+		this.state = { root: this.props.root }
 		this.nodeRef = React.createRef();
 
-		registerReaction('root-node-ui', 'state', ['select', 'create-new', 'unselect', 'restore', 'delete', 'got', 'change'], ()=>this.setState({root: chkSt('state', 'content')}))
-		registerReaction('root-node-ui', 'node-modal', ['close'], ()=>this.setState({}))
-		registerReaction('root-node-ui', 'dragndrop', ['on-over', 'on-drop'], ()=>this.setState({root: chkSt('state', 'content')}))
-		registerReaction('root-node-ui', 'clipboard', ['cut', 'paste'], ()=>this.setState({root: chkSt('state', 'content')}))
+		// registerReaction('root-node-ui', 'state', ['select', 'create-new', 'unselect', 'restore', 'delete', 'got', 'change'], ()=>this.setState({root: chkSt('state', 'content')}))
+		// registerReaction('root-node-ui', 'node-modal', ['close'], ()=>this.setState({}))
+		// registerReaction('root-node-ui', 'dragndrop', ['on-over', 'on-drop'], ()=>this.setState({root: chkSt('state', 'content')}))
+		// registerReaction('root-node-ui', 'clipboard', ['cut', 'paste'], ()=>this.setState({root: chkSt('state', 'content')}))
 
     //registerObject('main-ui', {'three-frames':true})
 	}
 
 	render() {
-
-		if (this.state.root == null) {
-			fireEvent('state', 'get')
-			return 'Loading...'
-		}
 
 		var leftNodes = []
 		var rightNodes = []
