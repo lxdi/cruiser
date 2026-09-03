@@ -46,6 +46,7 @@ registerEvent('state', 'unselect', (stateSetter) => selectNode(null))
 registerEvent('state', 'multiple-select-on', (stateSetter) => stateSetter("multiple-select", true))
 registerEvent('state', 'multiple-select-off', (stateSetter) => stateSetter("multiple-select", false))
 registerEvent('state', 'safe-point', (stateSetter) => doSafePoint())
+//registerEvent('state', 'panel-edit-switch', (stateSetter) => stateSetter("panel-edit", !chkSt('state', 'panel-edit')))
 
 registerEvent('state', 'create-new', (stateSetter) => {
 
@@ -114,6 +115,56 @@ registerEvent('state', 'change-panel', (stateSetter, panel) => {
     }
 
     panel.isCurrent = true
+    stateSetter('current-root', findCurrentPanel(content))
+})
+
+registerEvent('state', 'panel-move', (stateSetter, panel, direction) => {
+    const content = chkSt('state', 'content')
+
+    const curIndex = content.panels.indexOf(panel)
+    doSafePoint()
+
+    if (direction == 'right') {
+        if (curIndex + 1 >= content.panels.length ) {
+            return
+        }
+
+        content.panels.splice(curIndex, 1)
+        content.panels.splice(curIndex + 1 , 0, panel)
+    }
+
+    if (direction == 'left') {
+        if (curIndex - 1 < 0 ) {
+            return
+        }
+
+        content.panels.splice(curIndex, 1)
+        content.panels.splice(curIndex - 1 , 0, panel)
+    }
+
+    stateSetter('current-root', findCurrentPanel(content))
+    stateSetter('changed', true)
+})
+
+registerEvent('state', 'panel-remove', (stateSetter, panel) => {
+    const content = chkSt('state', 'content')
+
+    if (content.panels.length <= 1) {
+        console.log('1 panel left, cannot be removed')
+        return 
+    }
+
+    doSafePoint()
+
+    const curIndex = content.panels.indexOf(panel)
+    content.panels.splice(curIndex, 1)
+
+    if (curIndex - 1 >= 0) {
+        content.panels[curIndex - 1].isCurrent = true
+    } else {
+        content.panels[0].isCurrent = true
+    }
+
     stateSetter('current-root', findCurrentPanel(content))
     stateSetter('changed', true)
 })

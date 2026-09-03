@@ -36,3 +36,8 @@ const showSave = function() {
 const showUndo = function() {
     return chkSt('state', 'history').length > 0
 }
+
+// const editPanelButton = function() {
+//   const variant = chkSt('state', 'panel-edit') == true? 'outline-success': 'outline-secondary'
+//   return <Button id='panel-edit' onClick={()=>fireEvent('state', 'panel-edit-switch')} variant={variant} size="sm">Edit</Button>
+// }

@@ -11,10 +11,10 @@ export class Panels extends React.Component {
 		super(props);
 		this.state = { content: chkSt('state', 'content') }
 
-		registerReaction('panels-ui', 'state', ['select', 'create-new', 'unselect', 'restore', 'delete', 'got', 'change', 'create-panel', 'change-panel'], ()=>this.setState({content: chkSt('state', 'content')}))
-		registerReaction('root-node-ui', 'node-modal', ['close'], ()=>this.setState({}))
-		registerReaction('root-node-ui', 'dragndrop', ['on-over', 'on-drop'], ()=>this.setState({content: chkSt('state', 'content')}))
-		registerReaction('root-node-ui', 'clipboard', ['cut', 'paste'], ()=>this.setState({content: chkSt('state', 'content')}))
+		registerReaction('panels-ui', 'state', ['select', 'create-new', 'unselect', 'restore', 'delete', 'got', 'change', 'create-panel', 'change-panel', 'panel-edit-switch', 'panel-move'], ()=>this.setState({content: chkSt('state', 'content')}))
+		registerReaction('panels-ui', 'node-modal', ['close'], ()=>this.setState({}))
+		registerReaction('panels-ui', 'dragndrop', ['on-over', 'on-drop'], ()=>this.setState({content: chkSt('state', 'content')}))
+		registerReaction('panels-ui', 'clipboard', ['cut', 'paste'], ()=>this.setState({content: chkSt('state', 'content')}))
 
     //registerObject('main-ui', {'three-frames':true})
 	}
@@ -55,7 +55,12 @@ const plusTabTitle = function() {
 }
 
 const tabTitleUI = function(panel) {
-	return <div onClick={() => fireEvent('state', 'change-panel', [panel])}>{panel.name}</div>
+	const isEdit = panel.isCurrent == true
+	return <div onClick={() => fireEvent('state', 'change-panel', [panel])} style={{display: 'flex'}}>
+			{isEdit? <a href='#' onClick={()=>fireEvent('state', 'panel-move', [panel, 'left'])} style={{marginRight:'5px'}}>&lt;</a>: null}
+			{panel.name}
+			{isEdit? <a href='#' onClick={()=>fireEvent('state', 'panel-move', [panel, 'right'])} style={{marginLeft:'5px'}}>&gt;</a>: null}
+		</div>
 }
 
 const calcKey = function(panel) {

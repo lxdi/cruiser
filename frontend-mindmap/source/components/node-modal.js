@@ -25,7 +25,7 @@ export class NodeModal extends React.Component{
               {getModalBody(this)}
             </div>
             <Modal.Footer>
-              {this.state.isOpen? getFooterButtonsUI():''}
+              {this.state.isOpen? getFooterButtonsUI(this.state.node):''}
             </Modal.Footer>
       </Modal>
     )
@@ -72,6 +72,11 @@ const changeMarkerHandler = function(comp, e){
   fireEvent('state', 'change')
 }
 
-const getFooterButtonsUI = function() {
-    return <Button id='close' onClick={()=>fireEvent('node-modal', 'close')} variant="primary">Close</Button>
+const getFooterButtonsUI = function(node) {
+    const showDelete = node.left != null && node.right != null
+    return <div>
+        {showDelete? <Button id='close' onClick={()=>{fireEvent('state', 'panel-remove', [node]); fireEvent('node-modal', 'close')}} variant="danger" style={{marginRight:'5px'}} >Delete</Button>: null}
+        <Button id='close' onClick={()=>fireEvent('node-modal', 'close')} variant="primary">Close</Button>
+    </div>
+      
 }
