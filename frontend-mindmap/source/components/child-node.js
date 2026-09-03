@@ -166,7 +166,7 @@ const getLineUI = function(cord1, cord2) {
 	return <svg key = {x1 + y1 + x2 + y2}
           style={{ 
             position: 'absolute', top: 0, left: 0, 
-            width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1 
+            width: '1000%', height: '1000%', pointerEvents: 'none', zIndex: -1 
           }}
         >
 

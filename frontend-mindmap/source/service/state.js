@@ -1,9 +1,10 @@
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {sendGet, sendPost, sendPut, sendDelete} from './postoffice'
-import {getChildren, removeByValue, indexContent, indexNode, removeSystemPropsForContent} from './common.js'
+import {getChildren, removeByValue, indexContent, indexNode, removeSystemPropsForContent, generateUUID} from './common.js'
 
 const defaultName = 'Subtopic '
 var counter = 1
+var counterRoot = 1
 var history = []
 
 // var content = {
@@ -16,16 +17,14 @@ registerObject('state', {'selected': [], 'history': history})
 
 registerEvent('state', 'get', (stSetter)=>{
   sendGet('/content' + window.location.search, (content)=>{
-    if(content.name != null) {
-        document.title = content.name
-    }
-
+    const name = window.location.search.substring(window.location.search.lastIndexOf('/') + 1)
+    document.title = name
     content = migrateToPanels(content)
     fireEvent('state', 'got', [content])
   })
 })
 
-registerEvent('state', 'got', (stSetter, content)=>{ stSetter('content', content); stSetter('current-root', content.panels[0])})
+registerEvent('state', 'got', (stSetter, content)=>{ stSetter('content', content); stSetter('current-root', findCurrentPanel(content))})
 registerEvent('state', 'change', (stSetter)=>stSetter('changed', true))
 
 registerEvent('state', 'save', (stSetter)=> {
@@ -92,6 +91,33 @@ registerEvent('state', 'restore', (stateSetter) => {
     stateSetter('changed', true)
 })
 
+
+registerEvent('state', 'create-panel', (stateSetter) => {
+    const content = chkSt('state', 'content')
+    const newNode = createNewNode(true)
+    
+    for (const i in content.panels) {
+        content.panels[i].isCurrent = false
+    }
+
+    newNode.isCurrent = true
+    content.panels.push(newNode)
+    stateSetter('current-root', findCurrentPanel(content))
+    stateSetter('changed', true)
+})
+
+registerEvent('state', 'change-panel', (stateSetter, panel) => {
+    const content = chkSt('state', 'content')
+
+    for (const i in content.panels) {
+        content.panels[i].isCurrent = false
+    }
+
+    panel.isCurrent = true
+    stateSetter('current-root', findCurrentPanel(content))
+    stateSetter('changed', true)
+})
+
 export const doSafePoint = function() {
     const content = chkSt('state', 'content')
     removeSystemPropsForContent(content)
@@ -138,11 +164,20 @@ const createChildForParent = function(parent) {
     return newNode
 }
 
-const createNewNode = function() {
-    return { 
-        id: crypto.randomUUID(),
-        name: defaultName  + counter++,
+const createNewNode = function(isRoot) {
+    const res =  { 
+        id: generateUUID(),
      }
+
+     if (isRoot == true) {
+        res.left = []
+        res.right = []
+        res.name = "Topic " + counterRoot++
+     } else {
+        res.name = defaultName + counter++
+     }
+
+     return res
 }
 
 const preparedForSave = function(node) {
@@ -183,11 +218,21 @@ const migrateToPanels = function(content) {
         return content
     }
 
-    content.title = 'Untitlted'
+    content.isCurrent = true
 
     return {
         panels: [content]
     }
+}
+
+const findCurrentPanel = function(content) {
+    for(const i in content.panels) {
+        if (content.panels[i].isCurrent == true) {
+            return content.panels[i]
+        }
+    }
+    content.panels[0].isCurrent = true
+    return content.panels[0]
 }
 
 
