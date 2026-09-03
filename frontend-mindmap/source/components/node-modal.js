@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
-import {Editor, EditorState, RichUtils, convertFromRaw, convertToRaw} from 'draft-js'
+import {Editor, EditorState, RichUtils, convertFromRaw, convertToRaw, ContentState} from 'draft-js'
 
 
 
@@ -85,8 +85,15 @@ const serializeContent = function(editorState) {
 
 const deserializeContent = function(note) {
   if (note != null) {
-    const rawData = JSON.parse(note);
-    const contentState = convertFromRaw(rawData);
+    var contentState = null
+
+    try {
+      const rawData = JSON.parse(note);
+      contentState = convertFromRaw(rawData);
+    } catch (e) {
+      contentState = ContentState.createFromText(note)
+    }
+
     return EditorState.createWithContent(contentState);
   } else {
     return EditorState.createEmpty();
