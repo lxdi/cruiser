@@ -4,7 +4,11 @@ import {Modal, Button, Form} from 'react-bootstrap'
 import {registerObject, registerEvent, chkSt, fireEvent, registerReaction} from 'absevents'
 import {Editor, EditorState, RichUtils, convertFromRaw, convertToRaw, ContentState} from 'draft-js'
 
-
+const colorStyleMap = {
+  RED: { color: '#ff0000' },
+  BLUE: { color: '#0000ff' },
+  GREEN: { color: 'green' },
+};
 
 export class NodeModal extends React.Component{
   constructor(props){
@@ -32,15 +36,15 @@ export class NodeModal extends React.Component{
     return 'not-handled';
   }
 
-  _onBoldClick() {
-    this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, 'BOLD'));
+  _onStyleClick(style) {
+    this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, style));
   }
 
   render(){
     return (
       <Modal show={this.state.isOpen} dialogClassName='node-modal-style'>
             <Modal.Header>
-              <Modal.Title>Node details</Modal.Title>
+              <Modal.Title>{this.state.node != null? this.state.node.name: null}</Modal.Title>
             </Modal.Header>
             <div style={{margin:'5px'}}>
               {getModalBody(this)}
@@ -62,12 +66,20 @@ const getModalBody = function(comp) {
     return <div>
               <div>
                 <Form.Control type="text" value={comp.state.node.name} onChange={(e)=>changeNameHandler(comp, e)} onFocus={(e) => e.target.select()}/>
-                <div>
-                  <button onClick={comp._onBoldClick.bind(comp)}>Bold</button>
-                  <Editor editorState={comp.state.editorState} 
-                    onChange={comp.onChange} 
-                    handleKeyCommand={comp.handleKeyCommand}
-                  />
+                <div class="editor">
+                  <div class="editor-buttons">
+                    <Button id='bold' onClick={comp._onStyleClick.bind(comp, 'BOLD')} variant="outline-secondary" size="sm" style={{marginRight: '3px'}}>B</Button>
+                    <Button id='bold' onClick={comp._onStyleClick.bind(comp, 'RED')} variant="outline-danger" size="sm" style={{marginRight: '3px'}}>Red</Button>
+                    <Button id='bold' onClick={comp._onStyleClick.bind(comp, 'BLUE')} variant="outline-primary" size="sm" style={{marginRight: '3px'}}>Blue</Button>
+                    <Button id='bold' onClick={comp._onStyleClick.bind(comp, 'GREEN')} variant="outline-success" size="sm" style={{marginRight: '3px'}}>Green</Button>
+                  </div>
+                  <div class="editor-text">
+                    <Editor editorState={comp.state.editorState} 
+                      onChange={comp.onChange} 
+                      handleKeyCommand={comp.handleKeyCommand}
+                      customStyleMap={colorStyleMap} 
+                    />
+                  </div>
               </div>
                 <Form.Control placeholder = 'Link' type="text" value={comp.state.node.link} onChange={(e)=>changeLinkHandler(comp, e)}/>
                 <Form.Control placeholder = 'Marker' type="text" value={comp.state.node.marker} onChange={(e)=>changeMarkerHandler(comp, e)}/>

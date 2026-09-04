@@ -92,8 +92,8 @@ a:focus {
 }
 
 .node-modal-style {
-  max-width: 100%;
-  width:50%;
+  max-width: 1000px;
+  width:1000px;
 }
 
 .node-phantom {
@@ -106,4 +106,21 @@ a:focus {
 .node-link {
   height: 5px;
   width: 5px;
+}
+
+.editor {
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  margin-bottom: 3px;
+  margin-top: 3px;
+}
+
+.editor-buttons {
+  border-bottom: 1px solid lightgray;
+  padding: 3px;
+}
+
+.editor-text {
+  padding: 3px;
+  font-size: 10pt;
 }
