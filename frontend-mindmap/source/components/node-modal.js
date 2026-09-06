@@ -146,7 +146,13 @@ const getFooterButtonsUI = function(node, editorState) {
 
 const closeButtonHandler = function(node, editorState) {
   const initNote = node.note
-  node.note = serializeContent(editorState)
+  const plainText = editorState.getCurrentContent().getPlainText()
+
+  if (plainText != null && plainText.trim()  != '') {
+    node.note = serializeContent(editorState)
+  } else  {
+    node.note = null
+  }
 
   if (initNote != node.note) {
     fireEvent('state', 'change')
